@@ -11,6 +11,8 @@ import {BrowserRouter} from 'react-router-dom';
 import { Router, Route } from "react-router";
 import Diecutterdetails from './components/Diecutterdetails';
 import Diecutterwhatif from './components/Diecutterwhatif';
+import Login from './components/Login';
+import Factorylist from './components/Factorylist';
 
 class App extends React.Component {
   constructor() {
@@ -56,7 +58,9 @@ class App extends React.Component {
           <header>
           <h1>Dashboard</h1>
           </header>
-            <Route exact path="/" component={Diecutterlist} />
+            <Route exact path="/" component={Login} />
+            <Route exact path="/user/:handle/factories" component={Factorylist} />
+            <Route exact path="/diecutter/:handle" component={Diecutterlist} />
             <Route exact path="/details/:handle" component={Diecutterdetails} />
             <Route exact path="/details/:handle/whatif" component={Diecutterwhatif} />
         </div>
