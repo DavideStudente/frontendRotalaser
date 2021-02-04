@@ -9,6 +9,7 @@ import Diecutterinfo from './Diecutterinfo';
 import {factory1} from '../fakedata/data';
 import {diecutters} from '../fakedata/data';
 import {factories} from '../fakedata/data';
+import Warninglist from './Warninglist';
 
 class Diecutterlist extends React.Component {
   constructor(props) {
@@ -16,18 +17,83 @@ class Diecutterlist extends React.Component {
     this.state = {value: '',
                   value2: factories[0],
                   cutterselected: '',
-                  render: ''};
+                  render: '', username: '', keyA: '', factory:'', items: [], isLoaded: false};
 
     this.changeCutter = this.changeCutter.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
+  componentDidMount() {
+      this.setState({username: this.props.username});
+      this.setState({keyA: this.props.keyA});
+      this.setState({factory: this.props.factory});
+      console.log(this.state.username, this.state.keyA, this.state.factory);
+      const headers = { 'username': this.state.username, 'key': this.state.keyA };
+      fetch("http://localhost:8080/v1/factories/"+ this.props.factory+"/diecutters", { headers })
+              .then(res => res.json())
+              .then(
+                (result) => {
+                  this.setState({
+                    isLoaded: true,
+                    items: result
+                  });
+                  //alert('A name was submitted: ' + this.state.items);
+                  console.log("DIE CUTTER PERVENUTA");
+                  console.log(this.state.items[0].id);
+                  console.log("http://localhost:8080/v1/"+ this.state.factory+"/diecutters");
+                  
+
+                },
+                // Note: it's important to handle errors here
+                // instead of a catch() block so that we don't swallow
+                // exceptions from actual bugs in components.
+                (error) => {
+                  alert("ERRORE!" + error);
+                }
+              )
+  }
+  
+
+  componentDidUpdate() {
+    if (this.state.factory!=this.props.factory) {
+      this.setState({username: this.props.username});
+      this.setState({keyA: this.props.keyA});
+      this.setState({factory: this.props.factory});
+      console.log(this.state.username, this.state.keyA, this.state.factory);
+      const headers = { 'username': this.state.username, 'key': this.state.keyA };
+      fetch("http://localhost:8080/v1/factories/"+ this.props.factory+"/diecutters", { headers })
+              .then(res => res.json())
+              .then(
+                (result) => {
+                  this.setState({
+                    isLoaded: true,
+                    items: result
+                  });
+                  //alert('A name was submitted: ' + this.state.items);
+                  console.log("DIE CUTTER PERVENUTA");
+                  console.log(this.state.items[0].id);
+                  console.log("http://localhost:8080/v1/"+ this.state.factory+"/diecutters");
+                  
+
+                },
+                // Note: it's important to handle errors here
+                // instead of a catch() block so that we don't swallow
+                // exceptions from actual bugs in components.
+                (error) => {
+                  alert("ERRORE!" + error);
+                }
+              )
+      }
+     
+  }
+
+
   displayDieCutters() {
     var dieCuttersList=[];
     var i;
-    for (i=0 ; i<this.state.value2.diecutters.length; i++) {
-      dieCuttersList.push(<p><Button variant="primary"  value={this.state.value2.diecutters[i]} onClick={this.changeCutter} >DieCutter {this.state.value2.diecutters[i]}  </Button></p>);
+    for (i=0 ; i<this.state.items.length; i++) {
+      dieCuttersList.push(<p><Button variant="primary"  value={this.state.items[i].id} onClick={this.changeCutter} >DieCutter {this.state.items[i].id}  </Button></p>);
     }
     return dieCuttersList;
   }
@@ -78,8 +144,8 @@ class Diecutterlist extends React.Component {
       <Container fluid>
         <Row>
           <Col style={{backgroundColor: '#B8860B',  border:'2px solid black'}}>{this.displayDieCutters()} </Col>
-          <Col xs={6} style={{backgroundColor: '#BDB76B',  border:'2px solid black'}}><Diecutterinfo dataParentToChild={[cuttersel,1]}/></Col>
-          <Col style={{backgroundColor: '#B8860B',  border:'2px solid black'}}> {this.displayWarnings()}</Col>
+          <Col xs={6} style={{backgroundColor: '#BDB76B',  border:'2px solid black'}}><Diecutterinfo dataParentToChild={[cuttersel,1]} username={this.state.username} keyA={this.state.keyA}/></Col>
+          <Col style={{backgroundColor: '#B8860B',  border:'2px solid black'}}> <Warninglist username={this.state.username} keyA={this.state.keyA} factory={this.state.factory}/></Col>
         </Row>
       </Container>
       

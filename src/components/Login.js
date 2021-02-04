@@ -26,7 +26,7 @@ class Login extends React.Component {
   
     handleSubmit(event) {
       
-      this.props.history.push('/user/'+ this.state.username +'/factories');
+      this.props.history.push('/users/'+ this.state.username +'/factories');
       event.preventDefault();
     }
     //<Link to={"/details/"+information} className="btn btn-primary">SEE DETAILS</Link>

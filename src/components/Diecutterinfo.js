@@ -18,22 +18,55 @@ class Diecutterinfo extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-        value: ""
+        value: "", cutter: "", isLoaded:false, diecutter: '', warnings: []
     };
     this.displayStatus = this.displayStatus.bind(this);
   }
 
-  
+  componentDidUpdate() {
+
+    if (this.state.cutter!=this.props.dataParentToChild[0]) {
+      this.setState({username: this.props.username});
+      this.setState({keyA: this.props.keyA});
+      this.setState({cutter: this.props.dataParentToChild[0]});
+      const headers = { 'username': this.state.username, 'key': this.state.keyA };
+      fetch("http://localhost:8080/v1/diecutters/"+this.props.dataParentToChild[0], { headers })
+              .then(res => res.json())
+              .then(
+                (result) => {
+                  this.setState({
+                    isLoaded: true,
+                    diecutter: result
+                  });
+                  //alert('A name was submitted: ' + this.state.items);
+                  console.log("DIE CUTTER SELEZIONATA");
+                  console.log(this.state.diecutter.id);
+                  
+                  
+
+                },
+                // Note: it's important to handle errors here
+                // instead of a catch() block so that we don't swallow
+                // exceptions from actual bugs in components.
+                (error) => {
+                  alert("ERRORE!" + error);
+                }
+              )
+      
+      }
+     
+  }
+
 
   displayStatus(information) {
-    var diecutter = getDieCutterFromId(information);
-    if (diecutter.status=="ok") {
+    var diecutter = this.state.diecutter;
+    if (diecutter.status=='good') {
       return (<p><Button variant="success">GOOD</Button > <Button variant="secondary">WARNING</Button> <Button variant="secondary">CRITICAL</Button></p>);
     }
-    else if (diecutter.status=="warning") {
+    else if (diecutter.status=='warning') {
       return (<p><Button variant="secondary">GOOD</Button > <Button variant="warning">WARNING</Button> <Button variant="secondary">CRITICAL</Button></p>);
     }
-    else if (diecutter.status=="critical") {
+    else if (diecutter.status=='critical') {
       return (<p><Button variant="secondary">GOOD</Button > <Button variant="secondary">WARNING</Button> <Button variant="danger">CRITICAL</Button></p>);
     }
   }
@@ -44,8 +77,8 @@ class Diecutterinfo extends React.Component {
     var information = this.props.dataParentToChild[0];
     var showdetails = this.props.dataParentToChild[1];
     
-    var factoryId = getFactoryFromDieCutter(information);
-    var ownerName = getOwnerFromFactory(factoryId);
+   
+    var ownerName = this.props.username;
 
     //console.log("CIAODSADASJIADJIDASJI");
     //console.log(diecutter);
@@ -58,7 +91,7 @@ class Diecutterinfo extends React.Component {
         
         return (<div>
                     <div> DIE CUTTER {information}</div> 
-                    <div>OWNER: {ownerName}</div>
+                    
                     <div>INFO</div>
                     <div>STATUS: {this.displayStatus(information)} </div>
                     <div><Link to={"/details/"+information} className="btn btn-primary">SEE DETAILS</Link></div>
@@ -74,7 +107,7 @@ class Diecutterinfo extends React.Component {
         else {
           return (<div>
                       <div> DIE CUTTER {information}</div> 
-                      <div>OWNER: {ownerName}</div>
+                      
                       <div>INFO</div>
                       <div>STATUS: {this.displayStatus(information)} </div>
                   </div>);

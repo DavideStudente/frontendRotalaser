@@ -9,24 +9,27 @@ import Diecutterinfo from './Diecutterinfo';
 import {factory1} from '../fakedata/data';
 import {diecutters} from '../fakedata/data';
 import {factories} from '../fakedata/data';
-
+import {Link} from 'react-router-dom';
+import Diecutterlist from './Diecutterlist';
 
 
 class Factorylist extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {value: '', username: '', isLoaded: false, items: []};
+    this.state = {value: '', username: '', isLoaded: false, items: [], factoryselected: '', keyA: ''};
 
-    
+    this.changeFactory = this.changeFactory.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   componentDidMount () {
+    var usern=this.props.match.params.handle;
     this.setState({username: this.props.match.params.handle});
+    this.setState({keyA: 'chiave elegante'});
     console.log(this.props.match.params.handle);
-    const headers = { 'username': this.state.username, 'key': 'chiave elegante' };
-    fetch("http://localhost:8080/v1/"+ this.state.username+"factories", { headers })
+    const headers = { 'username': this.state.username, 'key': this.state.keyA };
+    fetch("http://localhost:8080/v1/users/"+ usern +"/factories", { headers })
             .then(res => res.json())
             .then(
               (result) => {
@@ -36,7 +39,7 @@ class Factorylist extends React.Component {
                 });
                 //alert('A name was submitted: ' + this.state.items);
                 console.log(this.state.items);
-                console.log("http://localhost:8080/v1/"+ this.state.username+"/factories");
+                console.log("http://localhost:8080/v1/users/"+ this.state.username+"/factories");
                 
 
               },
@@ -44,21 +47,36 @@ class Factorylist extends React.Component {
               // instead of a catch() block so that we don't swallow
               // exceptions from actual bugs in components.
               (error) => {
-                alert("ERRORE!" + error);
+                console.log("ERRORE!" + error);
               }
             )
      
   }
 
-  displayFactories() {
-    
+  changeFactory(event){
+    this.setState({factoryselected: event.target.value});
+    //console.log(this.state.factoryselected);
+  }
 
+  displayFactories() {
     var factoriesList=[];
-    var i;
-    for (i=0 ; i<this.state.items.length; i++) {
-      factoriesList.push(<p><Button variant="primary"  value={this.state.items[i].id}  >Factory {this.state.items[i].id}  </Button></p>);
+      var i;
+      for (i=0 ; i<this.state.items.length; i++) {
+        factoriesList.push(<p><Button variant="primary" value={this.state.items[i].id} onClick={this.changeFactory} > Factory {this.state.items[i].id}</Button></p>);
+        //<Link to={"/factories/"+this.state.items[i].id+"/diecutter"} className="btn btn-primary">Factory {this.state.items[i].id}</Link>
+      }
+    if (this.state.factoryselected=='') {
+      return factoriesList;
     }
-    return factoriesList;
+
+    else {
+      var factorysel=this.state.factoryselected;
+      factoriesList.push(<div> YOU ARE IN THE OVERVIEW OF THE FACTORY WITH ID: {this.state.factoryselected}</div>);
+      factoriesList.push(<div><Diecutterlist username={this.state.username} keyA={this.state.keyA} factory={this.state.factoryselected}/></div>)
+      return factoriesList;
+       
+      
+    }
   }
 
 

@@ -59,8 +59,8 @@ class App extends React.Component {
           <h1>Dashboard</h1>
           </header>
             <Route exact path="/" component={Login} />
-            <Route exact path="/user/:handle/factories" component={Factorylist} />
-            <Route exact path="/diecutter/:handle" component={Diecutterlist} />
+            <Route exact path="/users/:handle/factories" component={Factorylist} />
+            <Route exact path="/users/:handle/factories/:id/diecutters" component={Diecutterlist} />
             <Route exact path="/details/:handle" component={Diecutterdetails} />
             <Route exact path="/details/:handle/whatif" component={Diecutterwhatif} />
         </div>
