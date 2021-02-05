@@ -62,7 +62,7 @@ class Factorylist extends React.Component {
     var factoriesList=[];
       var i;
       for (i=0 ; i<this.state.items.length; i++) {
-        factoriesList.push(<p><Button variant="primary" value={this.state.items[i].id} onClick={this.changeFactory} > Factory {this.state.items[i].id}</Button></p>);
+        factoriesList.push(<Col><p><Button variant="primary" value={this.state.items[i].id} onClick={this.changeFactory} > Factory {this.state.items[i].id}</Button></p></Col>);
         //<Link to={"/factories/"+this.state.items[i].id+"/diecutter"} className="btn btn-primary">Factory {this.state.items[i].id}</Link>
       }
     if (this.state.factoryselected=='') {
@@ -71,7 +71,7 @@ class Factorylist extends React.Component {
 
     else {
       var factorysel=this.state.factoryselected;
-      factoriesList.push(<div> YOU ARE IN THE OVERVIEW OF THE FACTORY WITH ID: {this.state.factoryselected}</div>);
+      factoriesList.push(<Col><div><b>YOU ARE IN THE OVERVIEW OF THE FACTORY WITH ID: {this.state.factoryselected}</b> </div></Col>);
       factoriesList.push(<div><Diecutterlist username={this.state.username} keyA={this.state.keyA} factory={this.state.factoryselected}/></div>)
       return factoriesList;
        

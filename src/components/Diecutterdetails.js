@@ -36,7 +36,7 @@ class Diecutterdetails extends React.Component {
                 <Row > DieCutter Feature selected INFO</Row> 
               </Col>
               <Col style={{ backgroundColor: '#BDB76B',  border:'1px solid black'}}>
-                <Row style={{border:'1px solid black'}}> <Diecutterhistory/></Row>
+                <Row style={{border:'1px solid black'}}> <Diecutterhistory diecutter={this.state.value}/></Row>
                 <Row > {predictchart()}</Row> 
               </Col>
               <Col style={{backgroundColor: '#B8860B',  border:'1px solid black'}}> 
