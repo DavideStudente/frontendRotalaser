@@ -12,28 +12,46 @@ import getFactoryFromDieCutter from '../functionsGetData/getFactoryFromDieCutter
 import getOwnerFromFactory from '../functionsGetData/getOwnerFromFactory';
 import getDieCutterFromId from '../functionsGetData/getDieCutterFromId';
 import {Link} from 'react-router-dom';
+import {refreshToken} from '../utils/refreshToken';
 
 
 class Diecutterinfo extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-        value: "", cutter: "", isLoaded:false, diecutter: '', warnings: []
+        value: "", cutter: "", isLoaded:false, diecutter: '', warnings: [], keyA:''
     };
     this.displayStatus = this.displayStatus.bind(this);
   }
 
   componentDidUpdate() {
 
-    if (this.state.cutter!=this.props.dataParentToChild[0]) {
+    if (this.state.cutter!=this.props.dataParentToChild[0] || this.state.keyA!=sessionStorage.getItem('token')) {
       this.setState({username: this.props.username});
-      this.setState({keyA: this.props.keyA});
+      this.setState({keyA: sessionStorage.getItem('token')});
       this.setState({cutter: this.props.dataParentToChild[0]});
-      const headers = { 'username': this.state.username, 'key': this.state.keyA };
+      const headers = { 'key': sessionStorage.getItem('token') };
       fetch("http://localhost:8080/v1/diecutters/"+this.props.dataParentToChild[0], { headers })
-              .then(res => res.json())
+              .then(res => 
+                {
+                  if (res.status==401) {
+                    //console.log("token vecchio e scaduto!" + sessionStorage.getItem('token'));
+                    const newTok=refreshToken(sessionStorage.getItem('refreshToken'));
+                    //sessionStorage.setItem('token', newTok )
+                    //console.log("token nuovo e bellissimo!" + newTok);
+                    //console.log("token nuovo e bellissimo!" + sessionStorage.getItem('token'));
+                    this.setState({keyA: newTok})
+                    return "false";
+                    
+                  }
+                  else {
+                    return res.json()
+                  }
+                })
               .then(
                 (result) => {
+                  if (result == "false") return;
+                //console.log(result);
                   this.setState({
                     isLoaded: true,
                     diecutter: result
@@ -94,7 +112,7 @@ class Diecutterinfo extends React.Component {
                     
                     <div>INFO</div>
                     <div>STATUS: {this.displayStatus(information)} </div>
-                    <div><Link to={"/details/"+information} className="btn btn-primary">SEE DETAILS</Link></div>
+                    <div><Link to={{pathname:"/details/"+information, state:this.state.keyA}} className="btn btn-primary">SEE DETAILS</Link></div>
                 </div>);
         
         }

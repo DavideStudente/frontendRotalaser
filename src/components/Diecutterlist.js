@@ -10,6 +10,7 @@ import {factory1} from '../fakedata/data';
 import {diecutters} from '../fakedata/data';
 import {factories} from '../fakedata/data';
 import Warninglist from './Warninglist';
+import {refreshToken} from '../utils/refreshToken';
 
 class Diecutterlist extends React.Component {
   constructor(props) {
@@ -26,20 +27,38 @@ class Diecutterlist extends React.Component {
 
   componentDidMount() {
       this.setState({username: this.props.username});
-      this.setState({keyA: this.props.keyA});
+      this.setState({keyA: sessionStorage.getItem('token')});
       this.setState({factory: this.props.factory});
-      console.log(this.state.username, this.state.keyA, this.state.factory);
-      const headers = { 'username': this.state.username, 'key': this.state.keyA };
+     
+      const headers = { 'key': sessionStorage.getItem('token') };
       fetch("http://localhost:8080/v1/factories/"+ this.props.factory+"/diecutters", { headers })
-              .then(res => res.json())
-              .then(
-                (result) => {
+                .then(res => 
+                  {
+                    if (res.status==401) {
+                      //console.log("token vecchio e scaduto!" + sessionStorage.getItem('token'));
+                      const newTok=refreshToken(sessionStorage.getItem('refreshToken'));
+                      //sessionStorage.setItem('token', newTok )
+                      //console.log("token nuovo e bellissimo!" + newTok);
+                      //console.log("token nuovo e bellissimo!" + sessionStorage.getItem('token'));
+                      this.setState({keyA: newTok})
+                      return "false";
+                      
+                    }
+                    else {
+                      return res.json()
+                    }
+                  })
+                .then(
+                  (result) => {
+                    if (result == "false") return;
+                  //console.log(result);
                   this.setState({
                     isLoaded: true,
                     items: result
                   });
                   //alert('A name was submitted: ' + this.state.items);
                   console.log("DIE CUTTER PERVENUTA");
+                  console.log(sessionStorage.getItem('token'));
                   console.log(this.state.items[0].id);
                   console.log("http://localhost:8080/v1/"+ this.state.factory+"/diecutters");
                   
@@ -56,22 +75,40 @@ class Diecutterlist extends React.Component {
   
 
   componentDidUpdate() {
-    if (this.state.factory!=this.props.factory) {
+    if (this.state.factory!=this.props.factory || this.state.keyA!=sessionStorage.getItem('token')) {
       this.setState({username: this.props.username});
-      this.setState({keyA: this.props.keyA});
+      this.setState({keyA: sessionStorage.getItem('token')});
       this.setState({factory: this.props.factory});
-      console.log(this.state.username, this.state.keyA, this.state.factory);
-      const headers = { 'username': this.state.username, 'key': this.state.keyA };
+      
+      const headers = { 'key': sessionStorage.getItem('token') };
       fetch("http://localhost:8080/v1/factories/"+ this.props.factory+"/diecutters", { headers })
-              .then(res => res.json())
-              .then(
-                (result) => {
+                .then(res => 
+                  {
+                    if (res.status==401) {
+                      //console.log("token vecchio e scaduto!" + sessionStorage.getItem('token'));
+                      const newTok=refreshToken(sessionStorage.getItem('refreshToken'));
+                      //sessionStorage.setItem('token', newTok )
+                      //console.log("token nuovo e bellissimo!" + newTok);
+                      //console.log("token nuovo e bellissimo!" + sessionStorage.getItem('token'));
+                      this.setState({keyA: newTok})
+                      return "false";
+                      
+                    }
+                    else {
+                      return res.json()
+                    }
+                  })
+                .then(
+                  (result) => {
+                    if (result == "false") return;
+                    //console.log(result);
                   this.setState({
                     isLoaded: true,
                     items: result
                   });
                   //alert('A name was submitted: ' + this.state.items);
                   console.log("DIE CUTTER PERVENUTA");
+                  console.log(sessionStorage.getItem('token'));
                   console.log(this.state.items[0].id);
                   console.log("http://localhost:8080/v1/"+ this.state.factory+"/diecutters");
                   

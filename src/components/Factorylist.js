@@ -11,12 +11,13 @@ import {diecutters} from '../fakedata/data';
 import {factories} from '../fakedata/data';
 import {Link} from 'react-router-dom';
 import Diecutterlist from './Diecutterlist';
+import {refreshToken} from '../utils/refreshToken';
 
 
 class Factorylist extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {value: '', username: '', isLoaded: false, items: [], factoryselected: '', keyA: ''};
+    this.state = {value: '', username: '', isLoaded: false, items: [], factoryselected: '', keyA: '', refresh: 0};
 
     this.changeFactory = this.changeFactory.bind(this);
     this.handleChange = this.handleChange.bind(this);
@@ -26,20 +27,38 @@ class Factorylist extends React.Component {
   componentDidMount () {
     var usern=this.props.match.params.handle;
     this.setState({username: this.props.match.params.handle});
-    this.setState({keyA: 'chiave elegante'});
-    console.log(this.props.match.params.handle);
-    const headers = { 'username': this.state.username, 'key': this.state.keyA };
+    this.setState({keyA: sessionStorage.getItem('token')});
+    
+    //const headers = {'key': this.props.location.state };
+    const headers = {'key': sessionStorage.getItem('token') };
     fetch("http://localhost:8080/v1/users/"+ usern +"/factories", { headers })
-            .then(res => res.json())
+            .then(res => 
+              {
+                if (res.status==401) {
+                  console.log("token vecchio e scaduto!" + sessionStorage.getItem('token'));
+                  const newTok=refreshToken(sessionStorage.getItem('refreshToken'));
+                  //sessionStorage.setItem('token', newTok )
+                  //console.log("token nuovo e bellissimo!" + newTok);
+                  //console.log("token nuovo e bellissimo!" + sessionStorage.getItem('token'));
+                  this.setState({keyA: newTok})
+                  
+                  this.setState({refresh: 1 })
+                  return "false";
+                  
+                }
+                else {
+                  return res.json()
+                }
+              })
             .then(
               (result) => {
+                if (result == "false") return;
+                //console.log(result);
                 this.setState({
                   isLoaded: true,
                   items: result
                 });
-                //alert('A name was submitted: ' + this.state.items);
-                console.log(this.state.items);
-                console.log("http://localhost:8080/v1/users/"+ this.state.username+"/factories");
+                
                 
 
               },
@@ -50,6 +69,56 @@ class Factorylist extends React.Component {
                 console.log("ERRORE!" + error);
               }
             )
+     
+  }
+
+  componentDidUpdate () {
+    if (this.state.keyA!=sessionStorage.getItem('token')) {
+      //console.log("SONO NELL'UPDATE!" + sessionStorage.getItem('token'))
+      this.setState({refresh: 0});
+      var usern=this.props.match.params.handle;
+      this.setState({username: this.props.match.params.handle});
+      this.setState({keyA: sessionStorage.getItem('token')});
+      
+      //const headers = {'key': this.props.location.state };
+      const headers = {'key': sessionStorage.getItem('token') };
+      fetch("http://localhost:8080/v1/users/"+ usern +"/factories", { headers })
+              .then(res => 
+                {
+                  if (res.status==401) {
+                    //console.log("token vecchio e scaduto!" + sessionStorage.getItem('token'));
+                    const newTok=refreshToken(sessionStorage.getItem('refreshToken'));
+                    //sessionStorage.setItem('token', newTok )
+                    //console.log("token nuovo e bellissimo!" + newTok);
+                    //console.log("token nuovo e bellissimo!" + sessionStorage.getItem('token'));
+                    this.setState({keyA: newTok})
+                    return "false";
+                    
+                  }
+                  else {
+                    return res.json()
+                  }
+                })
+              .then(
+                (result) => {
+                  if (result == "false") return;
+                  //console.log(result);
+                  this.setState({
+                    isLoaded: true,
+                    items: result
+                  });
+                  
+                  
+
+                },
+                // Note: it's important to handle errors here
+                // instead of a catch() block so that we don't swallow
+                // exceptions from actual bugs in components.
+                (error) => {
+                  console.log("ERRORE!" + error);
+                }
+              )
+    }
      
   }
 

@@ -12,14 +12,15 @@ import Diecutterhistory from './Diecutterhistory';
 import cad from './cad.png';
 import predictchart from '../functionCharts/predictchart';
 import {Link} from 'react-router-dom';
-
+import {refreshToken} from '../utils/refreshToken';
 
 class Diecutterdetails extends React.Component {
 
     state = {
-        value: ''
+        value: '', keyA: ''
     }
     componentDidMount () {
+        this.setState({keyA: sessionStorage.getItem('token')})
         this.setState({value: this.props.match.params.handle});
         console.log(this.props.match.params.handle);
         
@@ -36,7 +37,7 @@ class Diecutterdetails extends React.Component {
                 <Row > DieCutter Feature selected INFO</Row> 
               </Col>
               <Col style={{ backgroundColor: '#BDB76B',  border:'1px solid black'}}>
-                <Row style={{border:'1px solid black'}}> <Diecutterhistory diecutter={this.state.value}/></Row>
+                <Row style={{border:'1px solid black'}}> <Diecutterhistory diecutter={this.state.value} keyA={this.state.keyA} /></Row>
                 <Row > {predictchart()}</Row> 
               </Col>
               <Col style={{backgroundColor: '#B8860B',  border:'1px solid black'}}> 

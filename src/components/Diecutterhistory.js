@@ -14,6 +14,7 @@ import Chart from 'chart.js';
 import {Line} from 'react-chartjs-2';
 import {cycles} from '../fakedata/cycles'
 import chartdiehistory from '../functionCharts/chartdiehistory';
+import {refreshToken} from '../utils/refreshToken';
 
 
 
@@ -24,7 +25,8 @@ var options= {
         xAxes: [{
             type: 'time',
             time: {
-                unit: 'minute', 
+
+                //unit: 'minute', 
                 unitStepSize: 30, //THIS IS THE RESOLUTION
                 displayFormats: {
                     'millisecond': 'h:mm MMM DD',
@@ -77,18 +79,36 @@ const data = {
 class Diecutterhistory extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {options: options, inputdate: '', diecutter: '', data: ''};
+    this.state = {options: options, inputdate: '', diecutter: '', data: '', keyA: ''};
     this.changeResolution = this.changeResolution.bind(this);
     this.changeStartDate = this.changeStartDate.bind(this);
     this.handlechangeStartDate=this.handlechangeStartDate.bind(this);
   }
 
   componentDidMount() {
-      const headers = { 'username': '123', 'key': 'chiave elegante' };
+      this.setState({diecutter: this.props.diecutter});
+      this.setState({keyA: sessionStorage.getItem('token')});
+      const headers = {'key': sessionStorage.getItem('token') };
       fetch("http://localhost:8080/v1/diecutters/"+this.props.diecutter, { headers })
-              .then(res => res.json())
-              .then(
-                (result) => {
+            .then(res => 
+              {
+                if (res.status==401) {
+                  //console.log("token vecchio e scaduto!" + sessionStorage.getItem('token'));
+                  const newTok=refreshToken(sessionStorage.getItem('refreshToken'));
+                  //sessionStorage.setItem('token', newTok )
+                  //console.log("token nuovo e bellissimo!" + newTok);
+                  //console.log("token nuovo e bellissimo!" + sessionStorage.getItem('token'));
+                  this.setState({keyA: newTok})
+                  return "false";
+                  
+                }
+                else {
+                  return res.json()
+                }
+              })
+            .then(
+              (result) => {
+                if (result == "false") return;
                   this.setState({
                     isLoaded: true,
                     diecutter: result
@@ -111,10 +131,26 @@ class Diecutterhistory extends React.Component {
               )
               var tmpvalue
               
-              fetch("http://localhost:8080/v1/diecutters/D1/cycles", { headers })
-                          .then(res => res.json())
+              fetch("http://localhost:8080/v1/diecutters/"+ this.props.diecutter +"/cycles", { headers })
+                          .then(res => 
+                            {
+                              if (res.status==401) {
+                                //console.log("token vecchio e scaduto!" + sessionStorage.getItem('token'));
+                                const newTok=refreshToken(sessionStorage.getItem('refreshToken'));
+                                //sessionStorage.setItem('token', newTok )
+                                //console.log("token nuovo e bellissimo!" + newTok);
+                                //console.log("token nuovo e bellissimo!" + sessionStorage.getItem('token'));
+                                this.setState({keyA: newTok})
+                                return "false";
+                                
+                              }
+                              else {
+                                return res.json()
+                              }
+                            })
                           .then(
                             (result) => {
+                              if (result == "false") return;
                               var cycles = result;
                               //alert('A name was submitted: ' + this.state.items);
                               console.log("CYCLES PERVENUTI");
@@ -148,11 +184,114 @@ class Diecutterhistory extends React.Component {
                               alert("ERRORE!" + error);
                             }
                     )
-              
-      
-      
-     
+   
   }
+
+  
+componentDidUpdate() {
+  if (this.state.keyA!=sessionStorage.getItem('token')) {
+    this.setState({keyA: sessionStorage.getItem('token')});
+    const headers = {'key': sessionStorage.getItem('token') };
+    fetch("http://localhost:8080/v1/diecutters/"+this.props.diecutter, { headers })
+            .then(res => 
+              {
+                if (res.status==401) {
+                  //console.log("token vecchio e scaduto!" + sessionStorage.getItem('token'));
+                  const newTok=refreshToken(sessionStorage.getItem('refreshToken'));
+                  //sessionStorage.setItem('token', newTok )
+                  //console.log("token nuovo e bellissimo!" + newTok);
+                  //console.log("token nuovo e bellissimo!" + sessionStorage.getItem('token'));
+                  this.setState({keyA: newTok})
+                  return "false";
+                  
+                }
+                else {
+                  return res.json()
+                }
+              })
+            .then(
+              (result) => {
+                if (result == "false") return;
+                this.setState({
+                  isLoaded: true,
+                  diecutter: result
+                });
+                //alert('A name was submitted: ' + this.state.items);
+                console.log("DIE CUTTER SELEZIONATA");
+                console.log(this.state.diecutter.id);
+                //var data=chartdiehistory(this.state.diecutter.id);
+                //this.setState({data: data});
+                
+                
+
+              },
+              // Note: it's important to handle errors here
+              // instead of a catch() block so that we don't swallow
+              // exceptions from actual bugs in components.
+              (error) => {
+                alert("ERRORE!" + error);
+              }
+            )
+            var tmpvalue
+            
+            fetch("http://localhost:8080/v1/diecutters/"+ this.props.diecutter +"/cycles", { headers })
+                        .then(res => 
+                          {
+                            if (res.status==401) {
+                              //console.log("token vecchio e scaduto!" + sessionStorage.getItem('token'));
+                              const newTok=refreshToken(sessionStorage.getItem('refreshToken'));
+                              //sessionStorage.setItem('token', newTok )
+                              //console.log("token nuovo e bellissimo!" + newTok);
+                              //console.log("token nuovo e bellissimo!" + sessionStorage.getItem('token'));
+                              this.setState({keyA: newTok})
+                              return "false";
+                              
+                            }
+                            else {
+                              return res.json()
+                            }
+                          })
+                        .then(
+                          (result) => {
+                            if (result == "false") return;
+                            var cycles = result;
+                            //alert('A name was submitted: ' + this.state.items);
+                            console.log("CYCLES PERVENUTI");
+                            console.log(cycles);
+                            
+                            var tmpvalue=data;
+                            //console.log(tmpvalue);
+                            //console.log(tmpvalue.labels);
+                            
+                            
+                            for (var i=0; i<cycles.length; i++) {
+                                tmpvalue.labels.push(new Date(cycles[i].createdAt));
+                                //console.log(new Date(cycles[i].createdAt));
+                                //tmpvalue.labels.push(new Date(cycles[i].year, cycles[i].month, cycles[i].day, cycles[i].hour, cycles[i].minute));
+                                //tmpvalue.labels.push(cycles[i].day + "/"+cycles[i].month+"/"+cycles[i].year+ " " +cycles[i].hour+":"+cycles[i].minute);
+                                //console.log(cycles[i].day + "/"+cycles[i].month+"/"+cycles[i].year+ " " +cycles[i].hour+":"+cycles[i].minute+ "  value:"+ cycles[i].value);
+                                tmpvalue.datasets[0].data.push(cycles[i].humidity);
+                                
+                                
+                                
+                            }
+                            console.log(tmpvalue);
+                            this.setState({data: tmpvalue});
+                            //return tmpvalue;
+          
+                          },
+                          // Note: it's important to handle errors here
+                          // instead of a catch() block so that we don't swallow
+                          // exceptions from actual bugs in components.
+                          (error) => {
+                            alert("ERRORE!" + error);
+                          }
+                  )
+  }
+ 
+}
+
+
   
   //TODO fare meglio
   changeResolution(event) {
