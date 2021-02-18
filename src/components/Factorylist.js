@@ -31,7 +31,7 @@ class Factorylist extends React.Component {
     
     //const headers = {'key': this.props.location.state };
     const headers = {'key': sessionStorage.getItem('token') };
-    fetch("http://localhost:8080/v1/users/"+ usern +"/factories", { headers })
+    fetch("https://localhost:8080/v1/users/"+ usern +"/factories", { headers })
             .then(res => 
               {
                 if (res.status==401) {
@@ -82,7 +82,7 @@ class Factorylist extends React.Component {
       
       //const headers = {'key': this.props.location.state };
       const headers = {'key': sessionStorage.getItem('token') };
-      fetch("http://localhost:8080/v1/users/"+ usern +"/factories", { headers })
+      fetch("https://localhost:8080/v1/users/"+ usern +"/factories", { headers })
               .then(res => 
                 {
                   if (res.status==401) {

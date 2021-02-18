@@ -34,7 +34,7 @@ class Login extends React.Component {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: this.state.username, password: this.state.password })
       };
-      fetch('http://localhost:8080/v1/login', requestOptions)
+      fetch('https://localhost:8080/v1/login', requestOptions)
           .then(response => {
             if (response.status==401) {
               alert("credenziali errate!")
