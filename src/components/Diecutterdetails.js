@@ -14,7 +14,7 @@ import predictchart from '../functionCharts/predictchart';
 import {Link} from 'react-router-dom';
 import {refreshToken} from '../utils/refreshToken';
 import ImageMapper from 'react-image-mapper';
-
+const circleToPolygon = require('circle-to-polygon');
 
 const coordinates = 
 [
@@ -188,23 +188,143 @@ const coordinates =
   ]
 
 
-  const areastmp =[];
-  var index;
+  const arcs = [
+    [ 856 , 48 , 8 , 8 , 0 , -89 , 0 ] ,
+    [ 792 , 48 , 8 , 8 , 0 , -179 , -90 ] ,
+    [ 658 , 58 , 3 , 3 , 0 , -90 , 0 ] ,
+    [ 658 , 57 , 4 , 4 , 0 , 0 , 89 ] ,
+    [ 658 , 208 , 4 , 4 , 0 , -89 , 0 ] ,
+    [ 658 , 207 , 4 , 4 , 0 , 0 , 89 ] ,
+    [ 566 , 251 , 10 , 10 , 0 , 0 , 89 ] ,
+    [ 607 , 20 , 9 , 9 , 0 , -179 , -89 ] ,
+    [ 607 , 807 , 10 , 10 , 0 , 90 , 179 ] ,
+    [ 566 , 575 , 9 , 9 , 0 , -90 , 0 ] ,
+    [ 658 , 619 , 4 , 4 , 0 , -89 , 0 ] ,
+    [ 658 , 619 , 4 , 4 , 0 , 0 , 89 ] ,
+    [ 658 , 769 , 4 , 4 , 0 , -89 , 0 ] ,
+    [ 658 , 769 , 4 , 4 , 0 , 0 , 89 ] ,
+    [ 989 , 769 , 4 , 4 , 0 , 90 , 179 ] ,
+    [ 989 , 769 , 3 , 3 , 0 , 179 , 270 ] ,
+    [ 989 , 619 , 3 , 3 , 0 , 89 , 180 ] ,
+    [ 989 , 619 , 3 , 3 , 0 , 179 , 270 ] ,
+    [ 1081 , 575 , 10 , 10 , 0 , -179 , -90 ] ,
+    [ 1040 , 807 , 10 , 10 , 0 , 0 , 89 ] ,
+    [ 1040 , 20 , 10 , 10 , 0 , -89 , 0 ] ,
+    [ 1081 , 251 , 10 , 10 , 0 , 90 , 179 ] ,
+    [ 989 , 207 , 4 , 4 , 0 , 90 , 179 ] ,
+    [ 989 , 207 , 3 , 3 , 0 , -180 , -89 ] ,
+    [ 989 , 57 , 4 , 4 , 0 , 90 , 179 ] ,
+    [ 989 , 58 , 4 , 4 , 0 , -179 , -90 ] ,
+    [ 799 , 631 , 15 , 15 , 0 , 90 , 179 ] ,
+    [ 792 , 779 , 7 , 7 , 0 , -269 , -179 ] ,
+    [ 856 , 779 , 8 , 8 , 0 , 0 , 89 ] ,
+    [ 849 , 631 , 14 , 14 , 0 , 0 , 90 ] ,
+    [ 799 , 195 , 14 , 14 , 0 , 179 , 270 ] ,
+    [ 849 , 195 , 14 , 14 , 0 , -90 , 0 ] ,
+    [ 313 , 47 , 7 , 7 , 0 , -90 , 0 ] ,
+    [ 249 , 48 , 8 , 8 , 0 , -179 , -90 ] ,
+    [ 115 , 58 , 3 , 3 , 0 , -90 , 0 ] ,
+    [ 115 , 57 , 4 , 4 , 0 , 0 , 89 ] ,
+    [ 115 , 208 , 4 , 4 , 0 , -89 , 0 ] ,
+    [ 115 , 207 , 4 , 4 , 0 , 0 , 89 ] ,
+    [ 23 , 252 , 9 , 9 , 0 , 0 , 90 ] ,
+    [ 64 , 20 , 9 , 9 , 0 , -180 , -89 ] ,
+    [ 64 , 807 , 10 , 10 , 0 , 90 , 179 ] ,
+    [ 23 , 575 , 9 , 9 , 0 , -90 , 0 ] ,
+    [ 115 , 619 , 3 , 3 , 0 , -90 , 0 ] ,
+    [ 115 , 619 , 3 , 3 , 0 , 0 , 90 ] ,
+    [ 115 , 769 , 3 , 3 , 0 , -90 , 0 ] ,
+    [ 115 , 769 , 4 , 4 , 0 , 0 , 89 ] ,
+    [ 446 , 769 , 4 , 4 , 0 , 90 , 179 ] ,
+    [ 446 , 769 , 3 , 3 , 0 , 179 , 270 ] ,
+    [ 446 , 619 , 3 , 3 , 0 , 89 , 180 ] ,
+    [ 446 , 619 , 3 , 3 , 0 , 179 , 270 ] ,
+    [ 538 , 575 , 9 , 9 , 0 , 179 , 270 ] ,
+    [ 497 , 807 , 10 , 10 , 0 , 0 , 89 ] ,
+    [ 497 , 20 , 10 , 10 , 0 , -89 , 0 ] ,
+    [ 538 , 251 , 10 , 10 , 0 , 90 , 179 ] ,
+    [ 446 , 207 , 4 , 4 , 0 , 90 , 179 ] ,
+    [ 446 , 207 , 3 , 3 , 0 , -180 , -89 ] ,
+    [ 446 , 58 , 3 , 3 , 0 , -270 , -179 ] ,
+    [ 446 , 57 , 3 , 3 , 0 , -180 , -89 ] ,
+    [ 256 , 631 , 14 , 14 , 0 , -270 , -179 ] ,
+    [ 249 , 779 , 8 , 8 , 0 , 90 , 179 ] ,
+    [ 313 , 779 , 8 , 8 , 0 , 0 , 89 ] ,
+    [ 306 , 631 , 14 , 14 , 0 , 0 , 90 ] ,
+    [ 256 , 196 , 15 , 15 , 0 , -179 , -90 ] ,
+    [ 306 , 195 , 14 , 14 , 0 , -90 , 0 ] ,
+    ]
   
   
-  for (index = 0; index < coordinates.length; index++) { 
-    console.log(coordinates[index])
-    /*if (coordinates[index][0]==coordinates[index][2]) {
-      coordinates[index][2]+=2
-      //areastmp.push({name:index.toString(), shape: "rect", coords: coordinates[index], preFillColor: "red"}) 
-    }
-    else if (coordinates[index][1]==coordinates[index][3]) {
-      //areastmp.push({name:index.toString(), shape: "rect", coords: coordinates[index], preFillColor: "red"})
-    }*/
-    const tmpcood=coordinates[index]
-    areastmp.push({name:index.toString(), shape: "poly", coords: [tmpcood[0], tmpcood[1], tmpcood[0]+5, tmpcood[1]+5, tmpcood[2]+5, tmpcood[3]+5, tmpcood[2], tmpcood[3]] , preFillColor: "red"}) 
+    const areastmp =[];
+    var index;
+    var i;
     
-  } 
+    /*
+    var widthDef = 1125; //todo prenderlo dalle proprietà dell'immagine
+    var newWidth = 500
+
+    for (index = 0; index < coordinates.length; index++) { 
+      for (i = 0; i < coordinates[index].length; i++) {
+        var tmpvaluecoord= coordinates[index][i] * (newWidth/widthDef)
+        coordinates[index][i]= tmpvaluecoord;
+      }
+    }    
+    
+    //angle * (Math.PI / 180)
+
+    for (index = 0; index < arcs.length; index++) {
+      var tmpvaluearc_x = arcs[index][0] * (newWidth/widthDef);
+      var tmpvaluearc_y = arcs[index][1] * (newWidth/widthDef);
+      arcs[index][0] = tmpvaluearc_x;
+      arcs[index][1] = tmpvaluearc_y;
+    }
+    */
+    
+
+    for (index = 0; index < coordinates.length; index++) { 
+    //console.log(coordinates[index])
+    
+      const tmpcood=coordinates[index]
+      areastmp.push({name:index.toString(), shape: "poly", coords: [tmpcood[0], tmpcood[1], tmpcood[0]+5, tmpcood[1]+5, tmpcood[2]+5, tmpcood[3]+5, tmpcood[2], tmpcood[3]] , preFillColor: "blue"}) 
+      
+    } 
+
+    for (index = 0; index < arcs.length; index++) {
+      var anglestart=arcs[index][5];
+      var angleend=arcs[index][6];
+      var center_x=arcs[index][0];
+      var center_y=arcs[index][1];
+      var radius = arcs[index][2];
+      var fragments= 32;
+      var frag= (anglestart-angleend)/fragments;
+      var allpp = [];
+      for (i=0; i<=fragments; i++) {
+        var radiant =((anglestart-(frag*i))* (Math.PI / 180));
+        var coordToFind_x = radius * Math.cos(radiant);
+        var coordToFind_y = radius * Math.sin(radiant);
+        if (i%2==0) {
+          allpp.push(center_x + coordToFind_x);
+          allpp.push(center_y + coordToFind_y);
+          allpp.push(center_x + coordToFind_x+2);
+          allpp.push(center_y + coordToFind_y+2);
+        }
+        else {
+          
+          allpp.push(center_x + coordToFind_x+2);
+          allpp.push(center_y + coordToFind_y+2);
+          allpp.push(center_x + coordToFind_x);
+          allpp.push(center_y + coordToFind_y);
+        }
+        
+        areastmp.push({name:index.toString()+"cavallo", shape: "poly", coords: allpp , preFillColor: "red"})
+        
+      }
+      
+      
+      
+    }
+  
 
 
 
@@ -224,6 +344,7 @@ class Diecutterdetails extends React.Component {
         this.setState({keyA: sessionStorage.getItem('token')})
         this.setState({value: this.props.match.params.handle});
         console.log(this.props.match.params.handle);
+        
         
         
     }
