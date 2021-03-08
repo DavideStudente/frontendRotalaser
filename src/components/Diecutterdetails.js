@@ -13,20 +13,278 @@ import cad from './cad.png';
 import predictchart from '../functionCharts/predictchart';
 import {Link} from 'react-router-dom';
 import {refreshToken} from '../utils/refreshToken';
+import ImageMapper from 'react-image-mapper';
+const circleToPolygon = require('circle-to-polygon');
+
+
+
+
 
 class Diecutterdetails extends React.Component {
 
-    state = {
-        value: '', keyA: ''
+    
+    constructor(props) {
+      super(props);
+      this.state = {
+        value: '', keyA: '', diecutterparts: '', image: '', diecutterdetail: '', diecutterpartselected: '',
+        MAP : {
+          name: "my-map",
+          areas: []
+        }
+      }
+      
+      
     }
+
+
+    displayImage(result) {
+      const areastmp =[];
+      var index;
+      var i;
+      
+      
+      
+      for (index = 0; index < result.length; index++) { 
+      //console.log(coordinates[index])
+        var tmpcood = JSON.parse(result[index].coords)
+        if (result[index].shape=="LINE") {
+          
+          
+          //const tmpcood=coordinates[index]
+          if (result[index].kind == "taglio") {
+            areastmp.push({name:JSON.stringify(result[index]), shape: "poly", coords: [tmpcood.x1, tmpcood.y1, tmpcood.x1+5, tmpcood.y1+5, tmpcood.x2+5, tmpcood.y2+5, tmpcood.x2, tmpcood.y2] , preFillColor: ""}) 
+          }
+          else if (result[index].kind == "piega") {
+            areastmp.push({name:JSON.stringify(result[index]), shape: "poly", coords: [tmpcood.x1, tmpcood.y1, tmpcood.x1+5, tmpcood.y1+5, tmpcood.x2+5, tmpcood.y2+5, tmpcood.x2, tmpcood.y2] , preFillColor: ""}) 
+          }
+        }
+        //"{"center_x":566,"center_y":251,"radius":10,"start_angle":0,"end_angle":89}"
+        else if (result[index].shape == "ARC") {
+          var anglestart=tmpcood.start_angle;
+          var angleend=tmpcood.end_angle;
+          var center_x=tmpcood.center_x;
+          var center_y=tmpcood.center_y;
+          var radius = tmpcood.radius;
+          var fragments= 32;
+          var frag= (anglestart-angleend)/fragments;
+          var allpp = [];
+          for (i=0; i<=fragments; i++) {
+            var radiant =((anglestart-(frag*i))* (Math.PI / 180));
+            var coordToFind_x = radius * Math.cos(radiant);
+            var coordToFind_y = radius * Math.sin(radiant);
+            if (i%2==0) {
+              allpp.push(center_x + coordToFind_x);
+              allpp.push(center_y + coordToFind_y);
+              allpp.push(center_x + coordToFind_x+2);
+              allpp.push(center_y + coordToFind_y+2);
+            }
+            else {
+              
+              allpp.push(center_x + coordToFind_x+2);
+              allpp.push(center_y + coordToFind_y+2);
+              allpp.push(center_x + coordToFind_x);
+              allpp.push(center_y + coordToFind_y);
+            }
+            if (result[index].kind == "taglio") {
+              areastmp.push({name:JSON.stringify(result[index]), shape: "poly", coords: allpp , preFillColor: ""})
+            }
+            else if (result[index].kind == "piega") {
+              areastmp.push({name:JSON.stringify(result[index]), shape: "poly", coords: allpp , preFillColor: ""})
+            }
+            
+          }
+        }
+      } 
+      this.setState({
+        MAP : {
+          name: "my-map",
+          areas: areastmp
+        }
+
+      })
+      
+    }
+
     componentDidMount () {
-        this.setState({keyA: sessionStorage.getItem('token')})
+
+      this.setState({keyA: sessionStorage.getItem('token')})
         this.setState({value: this.props.match.params.handle});
         console.log(this.props.match.params.handle);
         
+        //const headers = {'key': this.props.location.state };
+      const headers = {'key': sessionStorage.getItem('token') };
+      fetch("https://localhost:8080/v1/diecutters/"+ this.props.match.params.handle +"/diecutterparts", { headers })
+              .then(res => 
+                {
+                  if (res.status==401) {
+                    //console.log("token vecchio e scaduto!" + sessionStorage.getItem('token'));
+                    const newTok=refreshToken(sessionStorage.getItem('refreshToken'));
+                    //sessionStorage.setItem('token', newTok )
+                    //console.log("token nuovo e bellissimo!" + newTok);
+                    //console.log("token nuovo e bellissimo!" + sessionStorage.getItem('token'));
+                    this.setState({keyA: newTok})
+                    return "false";
+                    
+                  }
+                  else {
+                    return res.json()
+                  }
+                })
+              .then(
+                (result) => {
+                  if (result == "false") return;
+                  console.log(result);
+                  this.displayImage(result);
+                  this.setState({
+                    
+                    diecutterparts: result
+                  });
+                  
+                  
+
+                },
+                // Note: it's important to handle errors here
+                // instead of a catch() block so that we don't swallow
+                // exceptions from actual bugs in components.
+                (error) => {
+                  console.log("ERRORE!" + error);
+                }
+              )
+        
+              fetch("https://localhost:8080/v1/diecutters/"+ this.props.match.params.handle, { headers })
+              .then(res => 
+                {
+                  if (res.status==401) {
+                    //console.log("token vecchio e scaduto!" + sessionStorage.getItem('token'));
+                    const newTok=refreshToken(sessionStorage.getItem('refreshToken'));
+                    //sessionStorage.setItem('token', newTok )
+                    //console.log("token nuovo e bellissimo!" + newTok);
+                    //console.log("token nuovo e bellissimo!" + sessionStorage.getItem('token'));
+                    this.setState({keyA: newTok})
+                    return "false";
+                    
+                  }
+                  else {
+                    return res.json()
+                  }
+                })
+              .then(
+                (result) => {
+                  if (result == "false") return;
+                  //console.log(result);
+                  this.setState({
+                    
+                    diecutterdetail: result
+                  });
+                  //displayImage();
+                  
+
+                },
+                // Note: it's important to handle errors here
+                // instead of a catch() block so that we don't swallow
+                // exceptions from actual bugs in components.
+                (error) => {
+                  console.log("ERRORE!" + error);
+                }
+              )
+        
+        
+        
         
     }
+
+    componentDidUpdate() {
+      if (this.state.keyA!=sessionStorage.getItem('token')) {
+        this.setState({keyA: sessionStorage.getItem('token')})
+        this.setState({value: this.props.match.params.handle});
+        const headers = {'key': sessionStorage.getItem('token') };
+        fetch("https://localhost:8080/v1/diecutters/"+ this.props.match.params.handle +"/diecutterparts", { headers })
+              .then(res => 
+                {
+                  if (res.status==401) {
+                    //console.log("token vecchio e scaduto!" + sessionStorage.getItem('token'));
+                    const newTok=refreshToken(sessionStorage.getItem('refreshToken'));
+                    //sessionStorage.setItem('token', newTok )
+                    //console.log("token nuovo e bellissimo!" + newTok);
+                    //console.log("token nuovo e bellissimo!" + sessionStorage.getItem('token'));
+                    this.setState({keyA: newTok})
+                    return "false";
+                    
+                  }
+                  else {
+                    return res.json()
+                  }
+                })
+              .then(
+                (result) => {
+                  if (result == "false") return;
+                  console.log(result);
+                  this.displayImage(result);
+                  this.setState({
+                    
+                    diecutterparts: result
+                  });
+                  
+                  
+
+                },
+                // Note: it's important to handle errors here
+                // instead of a catch() block so that we don't swallow
+                // exceptions from actual bugs in components.
+                (error) => {
+                  console.log("ERRORE!" + error);
+                }
+              )
+
+              fetch("https://localhost:8080/v1/diecutters/"+ this.props.match.params.handle, { headers })
+              .then(res => 
+                {
+                  if (res.status==401) {
+                    //console.log("token vecchio e scaduto!" + sessionStorage.getItem('token'));
+                    const newTok=refreshToken(sessionStorage.getItem('refreshToken'));
+                    //sessionStorage.setItem('token', newTok )
+                    //console.log("token nuovo e bellissimo!" + newTok);
+                    //console.log("token nuovo e bellissimo!" + sessionStorage.getItem('token'));
+                    this.setState({keyA: newTok})
+                    return "false";
+                    
+                  }
+                  else {
+                    return res.json()
+                  }
+                })
+              .then(
+                (result) => {
+                  if (result == "false") return;
+                  //console.log(result);
+                  this.setState({
+                    
+                    diecutterdetail: result
+                  });
+                 
+                  
+
+                },
+                // Note: it's important to handle errors here
+                // instead of a catch() block so that we don't swallow
+                // exceptions from actual bugs in components.
+                (error) => {
+                  console.log("ERRORE!" + error);
+                }
+              )
+
+
+      }
+    }
+    
+    clickArea(area) {
+      this.setState({diecutterpartselected: area.name});
       
+    }
+
+    
+  
+    
 
     render() {
         return (
@@ -34,7 +292,7 @@ class Diecutterdetails extends React.Component {
             <Row>
               <Col  style={{backgroundColor: '#B8860B',  border:'1px solid black'}}> 
                 <Row style={{border:'1px solid black'}} ><Diecutterinfo dataParentToChild={[this.state.value,0]}/></Row>
-                <Row > DieCutter Feature selected INFO</Row> 
+                <Row > DieCutter Feature selected INFO: {this.state.diecutterpartselected}</Row> 
               </Col>
               <Col style={{ backgroundColor: '#BDB76B',  border:'1px solid black'}}>
                 <Row style={{border:'1px solid black'}}> <Diecutterhistory diecutter={this.state.value} keyA={this.state.keyA} /></Row>
@@ -42,7 +300,22 @@ class Diecutterdetails extends React.Component {
               </Col>
               <Col style={{backgroundColor: '#B8860B',  border:'1px solid black'}}> 
               <div>DIE CUTTER STATUS</div>
-              <img src={cad} alt="CAD" />
+                
+                <div className="container">
+                    <ImageMapper src={"data:image/png;base64,"+this.state.diecutterdetail.cadimage } map={this.state.MAP} 
+                     
+                      onClick={area => this.clickArea(area)}
+                      
+                      
+                    />
+                    {
+                      this.state.hoveredArea &&
+                      <span className="tooltip"
+                          style={{ ...this.getTipPosition(this.state.hoveredArea)}}>
+                        { this.state.hoveredArea && this.state.hoveredArea.name}
+                      </span>
+                    }
+                </div>
               <div><Link to={"/details/"+this.state.value+"/whatif"} className="btn btn-primary">WHAT-IF ANALYSIS</Link></div>
               </Col>
             </Row>
