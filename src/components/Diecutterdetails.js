@@ -52,10 +52,10 @@ class Diecutterdetails extends React.Component {
           
           //const tmpcood=coordinates[index]
           if (result[index].kind == "taglio") {
-            areastmp.push({name:JSON.stringify(result[index]), shape: "poly", coords: [tmpcood.x1, tmpcood.y1, tmpcood.x1+5, tmpcood.y1+5, tmpcood.x2+5, tmpcood.y2+5, tmpcood.x2, tmpcood.y2] , preFillColor: ""}) 
+            areastmp.push({name:JSON.stringify(result[index]), shape: "poly", coords: [tmpcood.x1, tmpcood.y1, tmpcood.x1+5, tmpcood.y1+5, tmpcood.x2+5, tmpcood.y2+5, tmpcood.x2, tmpcood.y2] , preFillColor: "blue"}) 
           }
           else if (result[index].kind == "piega") {
-            areastmp.push({name:JSON.stringify(result[index]), shape: "poly", coords: [tmpcood.x1, tmpcood.y1, tmpcood.x1+5, tmpcood.y1+5, tmpcood.x2+5, tmpcood.y2+5, tmpcood.x2, tmpcood.y2] , preFillColor: ""}) 
+            areastmp.push({name:JSON.stringify(result[index]), shape: "poly", coords: [tmpcood.x1, tmpcood.y1, tmpcood.x1+5, tmpcood.y1+5, tmpcood.x2+5, tmpcood.y2+5, tmpcood.x2, tmpcood.y2] , preFillColor: "yellow"}) 
           }
         }
         //"{"center_x":566,"center_y":251,"radius":10,"start_angle":0,"end_angle":89}"
@@ -86,10 +86,10 @@ class Diecutterdetails extends React.Component {
               allpp.push(center_y + coordToFind_y);
             }
             if (result[index].kind == "taglio") {
-              areastmp.push({name:JSON.stringify(result[index]), shape: "poly", coords: allpp , preFillColor: ""})
+              areastmp.push({name:JSON.stringify(result[index]), shape: "poly", coords: allpp , preFillColor: "red"})
             }
             else if (result[index].kind == "piega") {
-              areastmp.push({name:JSON.stringify(result[index]), shape: "poly", coords: allpp , preFillColor: ""})
+              areastmp.push({name:JSON.stringify(result[index]), shape: "poly", coords: allpp , preFillColor: "red"})
             }
             
           }
@@ -278,10 +278,41 @@ class Diecutterdetails extends React.Component {
     }
     
     clickArea(area) {
-      this.setState({diecutterpartselected: area.name});
+      this.setState({diecutterpartselected: JSON.parse(area.name)});
       
     }
 
+    displayDieCutterDetails() {
+      if (this.state.diecutterpartselected=='') {
+        return <div>DIECUTTERPART NOT SELECTED</div>
+      }
+      else {
+        var diecutterpartInfo = []
+        diecutterpartInfo.push(<p>DIECUTTERPART ID : {this.state.diecutterpartselected.id} </p>)
+        
+        diecutterpartInfo.push(<p>INFO VARIE</p>)
+        
+        diecutterpartInfo.push(<p>TIPO: {this.state.diecutterpartselected.kind}</p>)
+        
+        diecutterpartInfo.push(<p>STATUS: </p>)
+        
+        if (this.state.diecutterpartselected.status=='good') {
+          diecutterpartInfo.push(<p><Button variant="success">GOOD</Button > <Button variant="secondary">WARNING</Button> <Button variant="secondary">CRITICAL</Button></p>);
+        }
+        else if (this.state.diecutterpartselected.status=='warning') {
+          diecutterpartInfo.push(<p><Button variant="secondary">GOOD</Button > <Button variant="warning">WARNING</Button> <Button variant="secondary">CRITICAL</Button></p>);
+        }
+        else if (this.state.diecutterpartselected.status=='critical') {
+          diecutterpartInfo.push(<p><Button variant="secondary">GOOD</Button > <Button variant="secondary">WARNING</Button> <Button variant="danger">CRITICAL</Button></p>);
+        }
+        return (
+         <div>
+          {diecutterpartInfo}
+        </div>
+        )
+      }
+     
+    }
     
   
     
@@ -292,7 +323,7 @@ class Diecutterdetails extends React.Component {
             <Row>
               <Col  style={{backgroundColor: '#B8860B',  border:'1px solid black'}}> 
                 <Row style={{border:'1px solid black'}} ><Diecutterinfo dataParentToChild={[this.state.value,0]}/></Row>
-                <Row > DieCutter Feature selected INFO: {this.state.diecutterpartselected}</Row> 
+                <Row > {this.displayDieCutterDetails()}</Row> 
               </Col>
               <Col style={{ backgroundColor: '#BDB76B',  border:'1px solid black'}}>
                 <Row style={{border:'1px solid black'}}> <Diecutterhistory diecutter={this.state.value} keyA={this.state.keyA} /></Row>

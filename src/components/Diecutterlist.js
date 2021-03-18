@@ -59,7 +59,7 @@ class Diecutterlist extends React.Component {
                   //alert('A name was submitted: ' + this.state.items);
                   console.log("DIE CUTTER PERVENUTA");
                   console.log(sessionStorage.getItem('token'));
-                  console.log(this.state.items[0].id);
+                  
                   console.log("https://localhost:8080/v1/"+ this.state.factory+"/diecutters");
                   
 
@@ -109,7 +109,7 @@ class Diecutterlist extends React.Component {
                   //alert('A name was submitted: ' + this.state.items);
                   console.log("DIE CUTTER PERVENUTA");
                   console.log(sessionStorage.getItem('token'));
-                  console.log(this.state.items[0].id);
+                  
                   console.log("https://localhost:8080/v1/"+ this.state.factory+"/diecutters");
                   
 
@@ -156,7 +156,7 @@ class Diecutterlist extends React.Component {
     for (i=0; i<this.state.value2.diecutters.length; i++) {
       var diecutterId=this.state.value2.diecutters[i];
       var diecutterTmp;
-      //WE SHOULD GET THE DIE CUTTER WITH ID == diecutterId there, I will retrieve it from data.js for now and then replace with actual data
+      
       for (var y=0; y<diecutters.length; y++) {
         if (diecutters[y].id==diecutterId) {
           diecutterTmp=diecutters[y];
