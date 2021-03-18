@@ -13,6 +13,7 @@ import Diecutterdetails from './components/Diecutterdetails';
 import Diecutterwhatif from './components/Diecutterwhatif';
 import Login from './components/Login';
 import Factorylist from './components/Factorylist';
+import Adminview from './components/Adminview';
 
 class App extends React.Component {
   constructor() {
@@ -59,6 +60,7 @@ class App extends React.Component {
           <h1>Dashboard</h1>
           </header>
             <Route exact path="/" component={Login} />
+            <Route exact path="/admins/:handle/" component={Adminview}/>
             <Route exact path="/users/:handle/factories" component={Factorylist} />
             <Route exact path="/details/:handle" component={Diecutterdetails} />
             <Route exact path="/details/:handle/whatif" component={Diecutterwhatif} />

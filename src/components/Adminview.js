@@ -14,7 +14,7 @@ import Diecutterlist from './Diecutterlist';
 import {refreshToken} from '../utils/refreshToken';
 
 
-class Factorylist extends React.Component {
+class Adminview extends React.Component {
   constructor(props) {
     super(props);
     this.state = {value: '', username: '', isLoaded: false, items: [], factoryselected: '', keyA: '', refresh: 0, role: ''};
@@ -262,4 +262,4 @@ class Factorylist extends React.Component {
 
 
 
-export default Factorylist;
+export default Adminview;

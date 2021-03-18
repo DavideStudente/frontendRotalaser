@@ -47,16 +47,23 @@ class Login extends React.Component {
             }
           })
             .then(data => {
-            if (data=="false") {
-              return;
-            }
-            sessionStorage.setItem('refreshtoken', data.refreshtoken)
-            sessionStorage.setItem('token', data.token )
-            console.log("QUESTO è il refresh token! " + sessionStorage.getItem('refreshtoken'));
-            console.log("QUESTO è il token! " + sessionStorage.getItem('token'));
-            this.props.history.push({pathname:'/users/'+ this.state.username +'/factories', state: data.token})});
-      //this.props.history.push({path:'/users/'+ this.state.username +'/factories'});
-      event.preventDefault();
+              if (data=="false") {
+                return;
+              }
+              sessionStorage.setItem('refreshtoken', data.refreshtoken)
+              sessionStorage.setItem('token', data.token)
+              sessionStorage.setItem('role', data.role)
+              console.log("QUESTO è il refresh token! " + sessionStorage.getItem('refreshtoken'));
+              console.log("QUESTO è il token! " + sessionStorage.getItem('token'));
+              if (data.role=="admin") {
+                this.props.history.push({pathname:'/admin/'+ this.state.username +'/factories', state: data.token});
+              }
+              else {
+                this.props.history.push({pathname:'/users/'+ this.state.username +'/factories', state: data.token})
+              }
+            });
+            //this.props.history.push({path:'/users/'+ this.state.username +'/factories'});
+            event.preventDefault();
     }
     //<Link to={"/details/"+information} className="btn btn-primary">SEE DETAILS</Link>
     render() {
