@@ -14,6 +14,7 @@ import Diecutterwhatif from './components/Diecutterwhatif';
 import Login from './components/Login';
 import Factorylist from './components/Factorylist';
 import Adminview from './components/Adminview';
+import Createview from './components/CreateView';
 
 class App extends React.Component {
   constructor() {
@@ -64,6 +65,7 @@ class App extends React.Component {
             <Route exact path="/users/:handle/factories" component={Factorylist} />
             <Route exact path="/details/:handle" component={Diecutterdetails} />
             <Route exact path="/details/:handle/whatif" component={Diecutterwhatif} />
+            <Route exact path="/create" component={Createview}/>
         </div>
       </BrowserRouter>
       </body>

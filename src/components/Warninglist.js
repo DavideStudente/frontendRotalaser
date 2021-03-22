@@ -30,7 +30,7 @@ class Warninglist extends React.Component {
     this.setState({factory: this.props.factory});
     
     const headers = {'key': sessionStorage.getItem('token') };
-    fetch("https://localhost:8080/v1/factories/"+ this.props.factory+"/warnings", { headers })
+    fetch("https://localhost:5002/v1/factories/"+ this.props.factory+"/warnings", { headers })
               .then(res => 
                 {
                   if (res.status==401) {
@@ -78,7 +78,7 @@ componentDidUpdate() {
     this.setState({factory: this.props.factory});
     
     const headers = { 'key': sessionStorage.getItem('token') };
-    fetch("https://localhost:8080/v1/factories/"+ this.props.factory+"/warnings", { headers })
+    fetch("https://localhost:5002/v1/factories/"+ this.props.factory+"/warnings", { headers })
               .then(res => 
                 {
                   if (res.status==401) {

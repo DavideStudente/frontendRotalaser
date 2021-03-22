@@ -12,16 +12,17 @@ import {factories} from '../fakedata/data';
 import Warninglist from './Warninglist';
 import {refreshToken} from '../utils/refreshToken';
 
-class Diecutterlist extends React.Component {
+
+class Diecutterlistall extends React.Component {
   constructor(props) {
     super(props);
     this.state = {value: '',
                   value2: factories[0],
                   cutterselected: '',
                   customerselected: '',
-                  render: '', username: '', keyA: '', factory:'', items: [], isLoaded: false};
+                  render: '', username: '', keyA: '', factory:'', items: [], isLoaded: false, diecutterprop: ''};
 
-    this.changeCutter = this.changeCutter.bind(this);
+    
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
@@ -29,11 +30,11 @@ class Diecutterlist extends React.Component {
   componentDidMount() {
       this.setState({username: this.props.username});
       this.setState({keyA: sessionStorage.getItem('token')});
-      this.setState({factory: this.props.factory});
-      this.setState({customerselected: this.props.customer})
+      this.setState({cutterselected: this.props.diecutter})
+      this.setState({diecutterprop: this.props.diecutter})
      
       const headers = { 'key': sessionStorage.getItem('token') };
-      fetch("https://localhost:5002/v1/factories/"+ this.props.factory+"/diecutters", { headers })
+      fetch("https://localhost:5002/v1/diecutters", { headers })
                 .then(res => 
                   {
                     if (res.status==401) {
@@ -77,19 +78,16 @@ class Diecutterlist extends React.Component {
   
 
   componentDidUpdate() {
-    if (this.state.customerselected!=this.props.customer) {
-      this.setState({factory: ''})
-      this.setState({items: [] })
-      this.setState({customerselected: this.props.customer})
-    }
-    if ((this.state.factory!=this.props.factory || this.state.keyA!=sessionStorage.getItem('token'))  ) {
+    
+    if ((this.state.cutterselected!=this.props.diecutter || this.state.keyA!=sessionStorage.getItem('token'))  ) {
       this.setState({username: this.props.username});
-      this.setState({customerselected: this.props.customer})
+      this.setState({diecutterprop: this.props.diecutter})
+      this.setState({cutterselected: this.props.diecutter})
       this.setState({keyA: sessionStorage.getItem('token')});
-      this.setState({factory: this.props.factory});
+      
       
       const headers = { 'key': sessionStorage.getItem('token') };
-      fetch("https://localhost:5002/v1/factories/"+ this.props.factory+"/diecutters", { headers })
+      fetch("https://localhost:5002/v1/diecutters", { headers })
                 .then(res => 
                   {
                     if (res.status==401) {
@@ -131,21 +129,7 @@ class Diecutterlist extends React.Component {
   }
 
 
-  displayDieCutters() {
-    var dieCuttersList=[];
-    var i;
-    for (i=0 ; i<this.state.items.length; i++) {
-      dieCuttersList.push(<p><Button variant="primary"  value={this.state.items[i].id} onClick={this.changeCutter} >DieCutter {this.state.items[i].id}  </Button></p>);
-    }
-    
-    return dieCuttersList;
-  }
-
-  changeCutter(event){
-    this.setState({cutterselected: event.target.value});
-    //console.log(this.state.cutterselected);
-  }
-
+  
 
   handleChange(event) {
     this.setState({value: event.target.value});
@@ -156,28 +140,7 @@ class Diecutterlist extends React.Component {
     event.preventDefault();
   }
 
-  displayWarnings() {
-    var i;
-    var dieCutterWarnings=[]
-    for (i=0; i<this.state.value2.diecutters.length; i++) {
-      var diecutterId=this.state.value2.diecutters[i];
-      var diecutterTmp;
-      
-      for (var y=0; y<diecutters.length; y++) {
-        if (diecutters[y].id==diecutterId) {
-          diecutterTmp=diecutters[y];
-        }
-      }
-      if (diecutterTmp.status == "critical") {
-        dieCutterWarnings.push(<p><Button variant="danger" value={diecutterId} onClick={this.changeCutter} > {diecutterTmp.desc}</Button> </p>)
-      }
-      else if (diecutterTmp.status == "warning") {
-        dieCutterWarnings.push(<p><Button variant="warning" value={diecutterId} onClick={this.changeCutter} > {diecutterTmp.desc}</Button> </p>)
-      }
-      
-    }
-    return dieCutterWarnings;
-  }
+  
 
   render() {
     console.log("STO RENDERIZZANDOOO");
@@ -186,7 +149,7 @@ class Diecutterlist extends React.Component {
     return (
       <Container fluid>
         <Row>
-          <Col style={{backgroundColor: '#B8860B',  border:'2px solid black'}}>{this.displayDieCutters()} </Col>
+          <Col style={{backgroundColor: '#B8860B',  border:'2px solid black'}}> <p><Button variant="primary"  value={this.state.cutterselected} >DieCutter {this.state.cutterselected}  </Button></p> </Col>
           <Col xs={6} style={{backgroundColor: '#BDB76B',  border:'2px solid black'}}><Diecutterinfo dataParentToChild={[cuttersel,1]} username={this.state.username} keyA={this.state.keyA}/></Col>
           <Col style={{backgroundColor: '#B8860B',  border:'2px solid black'}}> <Warninglist username={this.state.username} keyA={this.state.keyA} factory={this.state.factory}/></Col>
         </Row>
@@ -199,4 +162,4 @@ class Diecutterlist extends React.Component {
 
 
 
-export default Diecutterlist;
+export default Diecutterlistall;

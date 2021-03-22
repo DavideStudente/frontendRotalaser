@@ -11,17 +11,24 @@ import {diecutters} from '../fakedata/data';
 import {factories} from '../fakedata/data';
 import {Link} from 'react-router-dom';
 import Diecutterlist from './Diecutterlist';
+import Factorylist from './Factorylist';
+import FactorylistCustomer from './FactorylistCustomer';
 import {refreshToken} from '../utils/refreshToken';
-
+import Diecutterlistall from './Diecutterlistall';
+import buttonadd from './addbutton.png'
+import { withRouter } from 'react-router';
 
 class Adminview extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {value: '', username: '', isLoaded: false, items: [], factoryselected: '', keyA: '', refresh: 0, role: ''};
+    this.state = {value: '', username: '', isLoaded: false, items: [], diecutterselected:'', customerselected: '', keyA: '', refresh: 0, role: '', diecutters: []};
 
-    this.changeFactory = this.changeFactory.bind(this);
+    this.changeCustomer = this.changeCustomer.bind(this);
+    this.changeDiecutter = this.changeDiecutter.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.redirectCreationCustomer=this.redirectCreationCustomer.bind(this);
+    this.redirectCreationDieCutter=this.redirectCreationDieCutter.bind(this);
   }
 
   componentDidMount () {
@@ -33,7 +40,7 @@ class Adminview extends React.Component {
     //const headers = {'key': this.props.location.state };
     const headers = {'key': sessionStorage.getItem('token') };
     if (sessionStorage.getItem('role') == "admin") {
-      fetch("https://localhost:8080/v1/factories", { headers })
+      fetch("https://localhost:5002/v1/customers", { headers })
                 .then(res => 
                   {
                     if (res.status==401) {
@@ -58,7 +65,47 @@ class Adminview extends React.Component {
                       isLoaded: true,
                       items: result
                     });
+                    console.log("QUESTI SONO I CUSTOMERS")
+                    console.log(result)
                     
+
+                  },
+                  // Note: it's important to handle errors here
+                  // instead of a catch() block so that we don't swallow
+                  // exceptions from actual bugs in components.
+                  (error) => {
+                    console.log("ERRORE!" + error);
+                  }
+                ).then( risultato => {
+
+
+                fetch("https://localhost:5002/v1/diecutters", { headers })
+                .then(res => 
+                  {
+                    if (res.status==401) {
+                      //console.log("token vecchio e scaduto!" + sessionStorage.getItem('token'));
+                      const newTok=refreshToken(sessionStorage.getItem('refreshToken'));
+                      //sessionStorage.setItem('token', newTok )
+                      //console.log("token nuovo e bellissimo!" + newTok);
+                      //console.log("token nuovo e bellissimo!" + sessionStorage.getItem('token'));
+                      this.setState({keyA: newTok})
+                      return "false";
+                      
+                    }
+                    else {
+                      return res.json()
+                    }
+                  })
+                .then(
+                  (result) => {
+                    if (result == "false") return;
+                    //console.log(result);
+                    this.setState({
+                
+                      diecutters: result
+                    });
+                    console.log("QUESTI SONO LE DIECUTTERS ")
+                    console.log(result)
                     
 
                   },
@@ -69,47 +116,10 @@ class Adminview extends React.Component {
                     console.log("ERRORE!" + error);
                   }
                 )
-    }
-    else {
-      fetch("https://localhost:8080/v1/users/"+ usern +"/factories", { headers })
-              .then(res => 
-                {
-                  if (res.status==401) {
-                    console.log("token vecchio e scaduto!" + sessionStorage.getItem('token'));
-                    const newTok=refreshToken(sessionStorage.getItem('refreshToken'));
-                    //sessionStorage.setItem('token', newTok )
-                    //console.log("token nuovo e bellissimo!" + newTok);
-                    //console.log("token nuovo e bellissimo!" + sessionStorage.getItem('token'));
-                    this.setState({keyA: newTok})
-                    
-                    this.setState({refresh: 1 })
-                    return "false";
-                    
-                  }
-                  else {
-                    return res.json()
-                  }
-                })
-              .then(
-                (result) => {
-                  if (result == "false") return;
-                  //console.log(result);
-                  this.setState({
-                    isLoaded: true,
-                    items: result
-                  });
-                  
-                  
-
-                },
-                // Note: it's important to handle errors here
-                // instead of a catch() block so that we don't swallow
-                // exceptions from actual bugs in components.
-                (error) => {
-                  console.log("ERRORE!" + error);
                 }
-              )
+                )
     }
+    
      
   }
 
@@ -124,7 +134,7 @@ class Adminview extends React.Component {
       //const headers = {'key': this.props.location.state };
       const headers = {'key': sessionStorage.getItem('token') };
       if (sessionStorage.getItem('role') == "admin") {
-        fetch("https://localhost:8080/v1/factories", { headers })
+        fetch("https://localhost:5002/v1/customers", { headers })
                 .then(res => 
                   {
                     if (res.status==401) {
@@ -149,7 +159,8 @@ class Adminview extends React.Component {
                       isLoaded: true,
                       items: result
                     });
-                    
+                    console.log("QUESTI SONO I CUSTOMERS")
+                    console.log(result)
                     
 
                   },
@@ -159,76 +170,140 @@ class Adminview extends React.Component {
                   (error) => {
                     console.log("ERRORE!" + error);
                   }
-                )
-      }
-      else {
-        fetch("https://localhost:8080/v1/users/"+ usern +"/factories", { headers })
-                .then(res => 
-                  {
-                    if (res.status==401) {
-                      //console.log("token vecchio e scaduto!" + sessionStorage.getItem('token'));
-                      const newTok=refreshToken(sessionStorage.getItem('refreshToken'));
-                      //sessionStorage.setItem('token', newTok )
-                      //console.log("token nuovo e bellissimo!" + newTok);
-                      //console.log("token nuovo e bellissimo!" + sessionStorage.getItem('token'));
-                      this.setState({keyA: newTok})
-                      return "false";
+                ).then( risultato => {
+
+
+                  fetch("https://localhost:5002/v1/diecutters", { headers })
+                  .then(res => 
+                    {
+                      if (res.status==401) {
+                        //console.log("token vecchio e scaduto!" + sessionStorage.getItem('token'));
+                        const newTok=refreshToken(sessionStorage.getItem('refreshToken'));
+                        //sessionStorage.setItem('token', newTok )
+                        //console.log("token nuovo e bellissimo!" + newTok);
+                        //console.log("token nuovo e bellissimo!" + sessionStorage.getItem('token'));
+                        this.setState({keyA: newTok})
+                        return "false";
+                        
+                      }
+                      else {
+                        return res.json()
+                      }
+                    })
+                  .then(
+                    (result) => {
+                      if (result == "false") return;
+                      //console.log(result);
+                      this.setState({
+                  
+                        diecutters: result
+                      });
+                      console.log("QUESTI SONO LE DIECUTTERS ")
+                      console.log(result)
                       
+  
+                    },
+                    // Note: it's important to handle errors here
+                    // instead of a catch() block so that we don't swallow
+                    // exceptions from actual bugs in components.
+                    (error) => {
+                      console.log("ERRORE!" + error);
                     }
-                    else {
-                      return res.json()
-                    }
-                  })
-                .then(
-                  (result) => {
-                    if (result == "false") return;
-                    //console.log(result);
-                    this.setState({
-                      isLoaded: true,
-                      items: result
-                    });
-                    
-                    
-
-                  },
-                  // Note: it's important to handle errors here
-                  // instead of a catch() block so that we don't swallow
-                  // exceptions from actual bugs in components.
-                  (error) => {
-                    console.log("ERRORE!" + error);
+                  )
                   }
-                )
+                  )
       }
+      
     }
      
   }
 
-  changeFactory(event){
-    this.setState({factoryselected: event.target.value});
-    //console.log(this.state.factoryselected);
+  changeCustomer(event){
+    this.setState({customerselected: event.target.value});
+    this.setState({diecutterselected: ''});
+    console.log("CHANGED CUSTOMER!");
+    console.log(this.state.customerselected);
   }
 
-  displayFactories() {
+  changeDiecutter(event){
+    this.setState({diecutterselected: event.target.value});
+    this.setState({customerselected: ''});
+    console.log("CHANGED DieCutter!");
+    console.log(this.state.customerselected);
+  }
+
+  displayChoose() {
     var factoriesList=[];
-      var i;
-      for (i=0 ; i<this.state.items.length; i++) {
-        factoriesList.push(<Col><p><Button variant="primary" value={this.state.items[i].id} onClick={this.changeFactory} > Factory {this.state.items[i].id}</Button></p></Col>);
-        //<Link to={"/factories/"+this.state.items[i].id+"/diecutter"} className="btn btn-primary">Factory {this.state.items[i].id}</Link>
+    
+    if (this.state.customerselected=='') {
+      if (this.state.diecutterselected=='') {
+        return factoriesList;
       }
-    if (this.state.factoryselected=='') {
-      return factoriesList;
+      else {
+        
+        factoriesList.push(<div><b>YOU ARE IN THE OVERVIEW OF THE DIECUTTER WITH ID: {this.state.diecutterselected}</b> </div>);
+        factoriesList.push(<div><Diecutterlistall username={this.state.username} diecutter={this.state.diecutterselected}/></div>)
+        return factoriesList;
+      }
+     
     }
 
     else {
-      var factorysel=this.state.factoryselected;
-      factoriesList.push(<Col><div><b>YOU ARE IN THE OVERVIEW OF THE FACTORY WITH ID: {this.state.factoryselected}</b> </div></Col>);
-      factoriesList.push(<div><Diecutterlist username={this.state.username} keyA={this.state.keyA} factory={this.state.factoryselected}/></div>)
+      
+      factoriesList.push(<div><b>YOU ARE IN THE OVERVIEW OF THE CUSTOMER WITH ID: {this.state.customerselected}</b> </div>);
+      factoriesList.push(<div><FactorylistCustomer customer={this.state.customerselected} history= {this.props.history}/></div>)
       return factoriesList;
-       
+      
       
     }
   }
 
+  redirectCreationCustomer(){
+
+    this.props.history.push({pathname:'/create', state: {element: "customer"}});
+  }
+
+  redirectCreationDieCutter() {
+    this.props.history.push({pathname:'/create', state: {element: "diecutter"}});
+  }
+
+  displayCustomers() {
+    var customersList=[];
+      var i;
+      customersList.push(<Col><p><Button variant="primary" onClick={this.redirectCreationCustomer} > Add Customer</Button></p></Col>)
+      for (i=0 ; i<this.state.items.length; i++) {
+        customersList.push(<Col><p><Button variant="primary" value={this.state.items[i].piva} onClick={this.changeCustomer} > Customer {this.state.items[i].piva}</Button></p></Col>);
+        //<Link to={"/factories/"+this.state.items[i].id+"/diecutter"} className="btn btn-primary">Factory {this.state.items[i].id}</Link>
+      }
+    
+    return customersList
+  }
+
+  
+
+  displayDiecutters() {
+    var diecuttersList=[];
+      var i;
+      diecuttersList.push(<Col><p><Button variant="primary" onClick={this.redirectCreationDieCutter} > Add DieCutter</Button>
+      </p></Col>)
+      for (i=0 ; i<this.state.diecutters.length; i++) {
+        diecuttersList.push(<Col><p><Button variant="primary" value={this.state.diecutters[i].id} onClick={this.changeDiecutter} > DieCutter {this.state.diecutters[i].id}</Button></p></Col>);
+        //<Link to={"/factories/"+this.state.items[i].id+"/diecutter"} className="btn btn-primary">Factory {this.state.items[i].id}</Link>
+      }
+    /*if (this.state.customerselected=='') {
+      return customersList;
+    }
+
+    else {
+      var customersel=this.state.customerselected;
+      customersList.push(<Col><div><b>YOU ARE IN THE OVERVIEW OF THE CUSTOMER WITH ID: {this.state.customerselected}</b> </div></Col>);
+      customersList.push(<div><FactorylistCustomer customer={this.state.customerselected}/></div>)
+      return customersList;
+       
+      
+    }*/
+    return diecuttersList;
+  }
 
 
 
@@ -250,9 +325,13 @@ class Adminview extends React.Component {
     return (
       <Container fluid>
         <Row>
-          <Col style={{backgroundColor: '#B8860B',  border:'2px solid black'}}>{this.displayFactories()} </Col>
-          
+          <Col style={{backgroundColor: '#B8860B',  border:'2px solid black'}}>{this.displayCustomers()} </Col>
+          <Col style={{backgroundColor: '#B8860B',  border:'2px solid black'}}>{this.displayDiecutters()} </Col>
         </Row>
+        <Row>
+          <Col style={{backgroundColor: '#B8860B',  border:'2px solid black'}}>{this.displayChoose()} </Col>  
+        </Row>
+        
       </Container>
       
     );

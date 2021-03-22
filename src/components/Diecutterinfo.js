@@ -31,7 +31,7 @@ class Diecutterinfo extends React.Component {
       this.setState({keyA: sessionStorage.getItem('token')});
       this.setState({cutter: this.props.dataParentToChild[0]});
       const headers = { 'key': sessionStorage.getItem('token') };
-      fetch("https://localhost:8080/v1/diecutters/"+this.props.dataParentToChild[0], { headers })
+      fetch("https://localhost:5002/v1/diecutters/"+this.props.dataParentToChild[0], { headers })
               .then(res => 
                 {
                   if (res.status==401) {

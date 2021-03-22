@@ -57,7 +57,7 @@ const data = {
 function chartdiehistory(diecutterId) {
   var tmpvalue
   const headers = { 'username': '123', 'key': 'chiave elegante' };
-  fetch("https://localhost:8080/v1/diecutters/D1/cycles", { headers })
+  fetch("https://localhost:5002/v1/diecutters/D1/cycles", { headers })
               .then(res => res.json())
               .then(
                 (result) => {

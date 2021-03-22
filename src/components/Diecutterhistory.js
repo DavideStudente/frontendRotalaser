@@ -89,7 +89,7 @@ class Diecutterhistory extends React.Component {
       this.setState({diecutter: this.props.diecutter});
       this.setState({keyA: sessionStorage.getItem('token')});
       const headers = {'key': sessionStorage.getItem('token') };
-      fetch("https://localhost:8080/v1/diecutters/"+this.props.diecutter, { headers })
+      fetch("https://localhost:5002/v1/diecutters/"+this.props.diecutter, { headers })
             .then(res => 
               {
                 if (res.status==401) {
@@ -131,7 +131,7 @@ class Diecutterhistory extends React.Component {
               )
               var tmpvalue
               
-              fetch("https://localhost:8080/v1/diecutters/"+ this.props.diecutter +"/cycles", { headers })
+              fetch("https://localhost:5002/v1/diecutters/"+ this.props.diecutter +"/cycles", { headers })
                           .then(res => 
                             {
                               if (res.status==401) {
@@ -192,7 +192,7 @@ componentDidUpdate() {
   if (this.state.keyA!=sessionStorage.getItem('token')) {
     this.setState({keyA: sessionStorage.getItem('token')});
     const headers = {'key': sessionStorage.getItem('token') };
-    fetch("https://localhost:8080/v1/diecutters/"+this.props.diecutter, { headers })
+    fetch("https://localhost:5002/v1/diecutters/"+this.props.diecutter, { headers })
             .then(res => 
               {
                 if (res.status==401) {
@@ -234,7 +234,7 @@ componentDidUpdate() {
             )
             var tmpvalue
             
-            fetch("https://localhost:8080/v1/diecutters/"+ this.props.diecutter +"/cycles", { headers })
+            fetch("https://localhost:5002/v1/diecutters/"+ this.props.diecutter +"/cycles", { headers })
                         .then(res => 
                           {
                             if (res.status==401) {

@@ -25,15 +25,15 @@ class Factorylist extends React.Component {
   }
 
   componentDidMount () {
-    var usern=this.props.match.params.handle;
-    this.setState({username: this.props.match.params.handle});
+    var usern=sessionStorage.getItem('username');
+    this.setState({username: sessionStorage.getItem('username')});
     this.setState({keyA: sessionStorage.getItem('token')});
     this.setState({role: sessionStorage.getItem('role')})
     
     //const headers = {'key': this.props.location.state };
     const headers = {'key': sessionStorage.getItem('token') };
     if (sessionStorage.getItem('role') == "admin") {
-      fetch("https://localhost:8080/v1/factories", { headers })
+      fetch("https://localhost:5002/v1/factories", { headers })
                 .then(res => 
                   {
                     if (res.status==401) {
@@ -71,7 +71,7 @@ class Factorylist extends React.Component {
                 )
     }
     else {
-      fetch("https://localhost:8080/v1/users/"+ usern +"/factories", { headers })
+      fetch("https://localhost:5002/v1/users/"+ usern +"/factories", { headers })
               .then(res => 
                 {
                   if (res.status==401) {
@@ -117,14 +117,14 @@ class Factorylist extends React.Component {
     if (this.state.keyA!=sessionStorage.getItem('token')) {
       //console.log("SONO NELL'UPDATE!" + sessionStorage.getItem('token'))
       this.setState({refresh: 0});
-      var usern=this.props.match.params.handle;
-      this.setState({username: this.props.match.params.handle});
+      var usern=sessionStorage.getItem('username');
+      this.setState({username: sessionStorage.getItem('username')});
       this.setState({keyA: sessionStorage.getItem('token')});
       
       //const headers = {'key': this.props.location.state };
       const headers = {'key': sessionStorage.getItem('token') };
       if (sessionStorage.getItem('role') == "admin") {
-        fetch("https://localhost:8080/v1/factories", { headers })
+        fetch("https://localhost:5002/v1/factories", { headers })
                 .then(res => 
                   {
                     if (res.status==401) {
@@ -162,7 +162,7 @@ class Factorylist extends React.Component {
                 )
       }
       else {
-        fetch("https://localhost:8080/v1/users/"+ usern +"/factories", { headers })
+        fetch("https://localhost:5002/v1/users/"+ usern +"/factories", { headers })
                 .then(res => 
                   {
                     if (res.status==401) {

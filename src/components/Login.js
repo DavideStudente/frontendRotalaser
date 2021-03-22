@@ -34,7 +34,7 @@ class Login extends React.Component {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: this.state.username, password: this.state.password })
       };
-      fetch('https://localhost:8080/v1/login', requestOptions)
+      fetch('https://localhost:5002/v1/login', requestOptions)
           .then(response => {
             if (response.status==401) {
               alert("credenziali errate!")
@@ -53,10 +53,11 @@ class Login extends React.Component {
               sessionStorage.setItem('refreshtoken', data.refreshtoken)
               sessionStorage.setItem('token', data.token)
               sessionStorage.setItem('role', data.role)
+              sessionStorage.setItem('username', this.state.username)
               console.log("QUESTO è il refresh token! " + sessionStorage.getItem('refreshtoken'));
               console.log("QUESTO è il token! " + sessionStorage.getItem('token'));
               if (data.role=="admin") {
-                this.props.history.push({pathname:'/admin/'+ this.state.username +'/factories', state: data.token});
+                this.props.history.push({pathname:'/admins/'+ this.state.username , state: data.token});
               }
               else {
                 this.props.history.push({pathname:'/users/'+ this.state.username +'/factories', state: data.token})
