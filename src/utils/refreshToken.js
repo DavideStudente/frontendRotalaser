@@ -6,7 +6,7 @@ export function refreshToken(refreshToken) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ refreshtoken: sessionStorage.getItem('refreshtoken') })
       };
-    fetch('https://localhost:5002/v1/refresh', requestOptions)
+    fetch('https://foiadev.diag.uniroma1.it:5002/v1/refresh', requestOptions)
           .then(response => {
             if (response.status==401) {
               alert("sessione scaduta, ritorno al login!")

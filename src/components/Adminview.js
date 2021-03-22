@@ -46,7 +46,7 @@ class Adminview extends React.Component {
     //const headers = {'key': this.props.location.state };
     const headers = {'key': sessionStorage.getItem('token') };
     if (sessionStorage.getItem('role') == "admin") {
-      fetch("https://localhost:5002/v1/customers", { headers })
+      fetch("https://foiadev.diag.uniroma1.it:5002/v1/customers", { headers })
                 .then(res => 
                   {
                     if (res.status==401) {
@@ -86,7 +86,7 @@ class Adminview extends React.Component {
                 ).then( risultato => {
 
 
-                fetch("https://localhost:5002/v1/diecutters", { headers })
+                fetch("https://foiadev.diag.uniroma1.it:5002/v1/diecutters", { headers })
                 .then(res => 
                   {
                     if (res.status==401) {
@@ -142,7 +142,7 @@ class Adminview extends React.Component {
       //const headers = {'key': this.props.location.state };
       const headers = {'key': sessionStorage.getItem('token') };
       if (sessionStorage.getItem('role') == "admin") {
-        fetch("https://localhost:5002/v1/customers", { headers })
+        fetch("https://foiadev.diag.uniroma1.it:5002/v1/customers", { headers })
                 .then(res => 
                   {
                     if (res.status==401) {
@@ -181,7 +181,7 @@ class Adminview extends React.Component {
                 ).then( risultato => {
 
 
-                  fetch("https://localhost:5002/v1/diecutters", { headers })
+                  fetch("https://foiadev.diag.uniroma1.it:5002/v1/diecutters", { headers })
                   .then(res => 
                     {
                       if (res.status==401) {

@@ -115,7 +115,7 @@ class Diecutterwhatif extends React.Component {
           
           //const headers = {'key': this.props.location.state };
         const headers = {'key': sessionStorage.getItem('token') };
-        fetch("https://localhost:5002/v1/diecutters/"+ this.props.match.params.handle +"/diecutterparts", { headers })
+        fetch("https://foiadev.diag.uniroma1.it:5002/v1/diecutters/"+ this.props.match.params.handle +"/diecutterparts", { headers })
                 .then(res => 
                   {
                     if (res.status==401) {
@@ -153,7 +153,7 @@ class Diecutterwhatif extends React.Component {
                   }
                 )
           
-                fetch("https://localhost:5002/v1/diecutters/"+ this.props.match.params.handle, { headers })
+                fetch("https://foiadev.diag.uniroma1.it:5002/v1/diecutters/"+ this.props.match.params.handle, { headers })
                 .then(res => 
                   {
                     if (res.status==401) {
