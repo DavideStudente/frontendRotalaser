@@ -111,6 +111,12 @@ class Createcustomer extends React.Component {
       fetch('https://localhost:5002/v1/customers', requestOptions)
           .then(response => {
             console.log(response.json())
+            if (response.status == 200) {
+              this.props.history.goBack();
+            }
+            else {
+              alert("c'è stato un errore")
+            }
           })
     event.preventDefault();
             

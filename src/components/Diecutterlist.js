@@ -19,11 +19,13 @@ class Diecutterlist extends React.Component {
                   value2: factories[0],
                   cutterselected: '',
                   customerselected: '',
-                  render: '', username: '', keyA: '', factory:'', items: [], isLoaded: false};
+                  render: '', username: '', keyA: '', factory:'', items: [], isLoaded: false,
+                diecuttersfiltered:[]};
 
     this.changeCutter = this.changeCutter.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.filterDiecutters = this.filterDiecutters.bind(this);
   }
 
   componentDidMount() {
@@ -58,6 +60,8 @@ class Diecutterlist extends React.Component {
                     isLoaded: true,
                     items: result
                   });
+                  this.setState({diecuttersfiltered: this.state.items})
+
                   //alert('A name was submitted: ' + this.state.items);
                   console.log("DIE CUTTER PERVENUTA");
                   console.log(sessionStorage.getItem('token'));
@@ -70,7 +74,7 @@ class Diecutterlist extends React.Component {
                 // instead of a catch() block so that we don't swallow
                 // exceptions from actual bugs in components.
                 (error) => {
-                  alert("ERRORE!" + error);
+                  console.log("ERRORE!" + error);
                 }
               )
   }
@@ -114,6 +118,7 @@ class Diecutterlist extends React.Component {
                     isLoaded: true,
                     items: result
                   });
+                  this.setState({diecuttersfiltered: result})
                   //alert('A name was submitted: ' + this.state.items);
                  
                   
@@ -123,19 +128,45 @@ class Diecutterlist extends React.Component {
                 // instead of a catch() block so that we don't swallow
                 // exceptions from actual bugs in components.
                 (error) => {
-                  alert("ERRORE!" + error);
+                  console.log("ERRORE!" + error);
                 }
               )
       }
      
   }
 
+  filterDiecutters(event) {
+    var i;
+    if (event.target.value=='') {
+      this.setState({diecuttersfiltered: this.state.items})
+    }
+    var diecuttersfiltered = []
+   
+    for (i=0; i<this.state.items.length; i++) {
+      if ((this.state.items[i].id).includes(event.target.value)) {
+        
+        diecuttersfiltered.push(this.state.items[i])
+        
+        
+      }
+    }
+    this.setState({diecuttersfiltered: diecuttersfiltered})
+  }
 
   displayDieCutters() {
     var dieCuttersList=[];
     var i;
-    for (i=0 ; i<this.state.items.length; i++) {
-      dieCuttersList.push(<p><Button variant="primary"  value={this.state.items[i].id} onClick={this.changeCutter} >DieCutter {this.state.items[i].id}  </Button></p>);
+    dieCuttersList.push(<Col><p><input type="text" onChange={this.filterDiecutters} />   Search Diecutters   </p></Col>)
+
+    for (i=0 ; i<this.state.diecuttersfiltered.length; i++) {
+      if (this.state.cutterselected==this.state.diecuttersfiltered[i].id) {
+        dieCuttersList.push(<p><Button variant="dark"  value={this.state.diecuttersfiltered[i].id} onClick={this.changeCutter} >DieCutter {this.state.diecuttersfiltered[i].id}  </Button></p>);
+
+      }
+      else {
+        dieCuttersList.push(<p><Button variant="primary"  value={this.state.diecuttersfiltered[i].id} onClick={this.changeCutter} >DieCutter {this.state.diecuttersfiltered[i].id}  </Button></p>);
+
+      }
     }
     
     return dieCuttersList;

@@ -18,7 +18,7 @@ class Factorylist extends React.Component {
   constructor(props) {
     super(props);
     this.state = {value: '', username: '', isLoaded: false, items: [], factoryselected: '', keyA: '', refresh: 0, role: '',
-     customerselected: '', users: [], userselected: ''};
+     customerselected: '', users: [], userselected: '', factoriesfiltered: [], usersfiltered:[]};
 
     this.changeFactory = this.changeFactory.bind(this);
     this.changeUser = this.changeUser.bind(this);
@@ -26,7 +26,8 @@ class Factorylist extends React.Component {
     this.handleSubmit = this.handleSubmit.bind(this);
     this.redirectCreationFactory=this.redirectCreationFactory.bind(this);
     this.redirectCreationUser=this.redirectCreationUser.bind(this);
-
+    this.filterFactories=this.filterFactories.bind(this);
+    this.filterUsers=this.filterUsers.bind(this);
   }
 
   componentDidMount () {
@@ -65,7 +66,7 @@ class Factorylist extends React.Component {
                       isLoaded: true,
                       items: result
                     });
-                    
+                    this.setState({factoriesfiltered: this.state.items})
                     
 
                   },
@@ -101,7 +102,9 @@ class Factorylist extends React.Component {
                       isLoaded: true,
                       users: result
                     });
-                    
+                    this.setState({
+                      usersfiltered: this.state.users
+                    })
                     
 
                   },
@@ -159,7 +162,7 @@ class Factorylist extends React.Component {
                         isLoaded: true,
                         items: result
                       });
-                      
+                      this.setState({factoriesfiltered: result})
                       
   
                     },
@@ -195,6 +198,7 @@ class Factorylist extends React.Component {
                         isLoaded: true,
                         users: result
                       });
+                      this.setState({usersfiltered: result})
                       
                       
   
@@ -236,14 +240,41 @@ class Factorylist extends React.Component {
     this.props.history.push({pathname:'/create', state: {element: "user", customerId: this.state.customerselected}});
   }
 
+  filterFactories(event) {
+    var i;
+    if (event.target.value=='') {
+      this.setState({factoriesfiltered: this.state.items})
+    }
+    var factoriesfiltered = []
+   
+    for (i=0; i<this.state.items.length; i++) {
+      if ((this.state.items[i].id).includes(event.target.value)) {
+        
+        factoriesfiltered.push(this.state.items[i])
+        
+        
+      }
+    }
+    this.setState({factoriesfiltered: factoriesfiltered})
+  }
+
+
   displayFactories() {
     var factoriesList=[];
       var i;
+      factoriesList.push(<Col><p><input type="text" onChange={this.filterFactories} />   Search Factories   </p></Col>)
+
       factoriesList.push(<Col><p><Button variant="primary" onClick={this.redirectCreationFactory} > AddFactoryToCustomer</Button></p></Col>)
 
-      for (i=0 ; i<this.state.items.length; i++) {
+      for (i=0 ; i<this.state.factoriesfiltered.length; i++) {
+        if (this.state.factoryselected == this.state.factoriesfiltered[i].id) {
+          factoriesList.push(<Col><p><Button variant="dark" value={this.state.factoriesfiltered[i].id} onClick={this.changeFactory} > Factory {this.state.factoriesfiltered[i].id}</Button></p></Col>);
 
-        factoriesList.push(<Col><p><Button variant="primary" value={this.state.items[i].id} onClick={this.changeFactory} > Factory {this.state.items[i].id}</Button></p></Col>);
+        }
+        else {
+          factoriesList.push(<Col><p><Button variant="primary" value={this.state.factoriesfiltered[i].id} onClick={this.changeFactory} > Factory {this.state.factoriesfiltered[i].id}</Button></p></Col>);
+
+        }
         //<Link to={"/factories/"+this.state.items[i].id+"/diecutter"} className="btn btn-primary">Factory {this.state.items[i].id}</Link>
       }
     /*if (this.state.factoryselected=='') {
@@ -281,7 +312,8 @@ class Factorylist extends React.Component {
 
     else {
       
-      factoriesList.push(<div><b>YOU ARE IN THE OVERVIEW OF THE CUSTOMER WITH ID: {this.state.customerselected}</b> </div>);
+      factoriesList.push(<div><b>YOU ARE IN THE OVERVIEW OF THE USER WITH ID: {this.state.userselected}</b> </div>);
+      //TODO list the factories of the users
       //factoriesList.push(<div><FactorylistCustomer customer={this.state.customerselected} history= {this.props.history}/></div>)
       return factoriesList;
       
@@ -289,14 +321,40 @@ class Factorylist extends React.Component {
     }
   }
 
+  filterUsers(event) {
+    var i;
+    if (event.target.value=='') {
+      this.setState({usersfiltered: this.state.users})
+    }
+    var usersfiltered = []
+   
+    for (i=0; i<this.state.users.length; i++) {
+      if ((this.state.users[i].id).includes(event.target.value)) {
+        
+        usersfiltered.push(this.state.users[i])
+        
+        
+      }
+    }
+    this.setState({usersfiltered: usersfiltered})
+  }
+
   displayUsers() {
     var usersList=[];
     var i;
+    usersList.push(<Col><p><input type="text" onChange={this.filterUsers} />   Search Users   </p></Col>)
+
     usersList.push(<Col><p><Button variant="primary" onClick={this.redirectCreationUser} > AddUserToCustomer</Button></p></Col>)
 
-    for (i=0 ; i<this.state.users.length; i++) {
+    for (i=0 ; i<this.state.usersfiltered.length; i++) {
+      if (this.state.userselected==this.state.usersfiltered[i].id) {
+        usersList.push(<Col><p><Button variant="dark" value={this.state.usersfiltered[i].id} onClick={this.changeUser} > User {this.state.usersfiltered[i].id}</Button></p></Col>);
 
-      usersList.push(<Col><p><Button variant="primary" value={this.state.users[i].id} onClick={this.changeUser} > User {this.state.users[i].id}</Button></p></Col>);
+      }
+      else {
+        usersList.push(<Col><p><Button variant="primary" value={this.state.usersfiltered[i].id} onClick={this.changeUser} > User {this.state.usersfiltered[i].id}</Button></p></Col>);
+
+      }
       //<Link to={"/factories/"+this.state.items[i].id+"/diecutter"} className="btn btn-primary">Factory {this.state.items[i].id}</Link>
     }
     /*

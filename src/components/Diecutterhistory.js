@@ -126,7 +126,7 @@ class Diecutterhistory extends React.Component {
                 // instead of a catch() block so that we don't swallow
                 // exceptions from actual bugs in components.
                 (error) => {
-                  alert("ERRORE!" + error);
+                  console.log("ERRORE!" + error);
                 }
               )
               var tmpvalue
@@ -181,7 +181,7 @@ class Diecutterhistory extends React.Component {
                             // instead of a catch() block so that we don't swallow
                             // exceptions from actual bugs in components.
                             (error) => {
-                              alert("ERRORE!" + error);
+                              console.log("ERRORE!" + error);
                             }
                     )
    
@@ -229,7 +229,7 @@ componentDidUpdate() {
               // instead of a catch() block so that we don't swallow
               // exceptions from actual bugs in components.
               (error) => {
-                alert("ERRORE!" + error);
+                console.log("ERRORE!" + error);
               }
             )
             var tmpvalue
@@ -284,7 +284,7 @@ componentDidUpdate() {
                           // instead of a catch() block so that we don't swallow
                           // exceptions from actual bugs in components.
                           (error) => {
-                            alert("ERRORE!" + error);
+                            console.log("ERRORE!" + error);
                           }
                   )
   }

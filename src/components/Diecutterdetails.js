@@ -94,6 +94,7 @@ class Diecutterdetails extends React.Component {
             
           }
         }
+        //TODO definire anche i CIRCLES!!!
       } 
       this.setState({
         MAP : {

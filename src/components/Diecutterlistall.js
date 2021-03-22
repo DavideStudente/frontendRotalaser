@@ -71,7 +71,7 @@ class Diecutterlistall extends React.Component {
                 // instead of a catch() block so that we don't swallow
                 // exceptions from actual bugs in components.
                 (error) => {
-                  alert("ERRORE!" + error);
+                  console.log("ERRORE!" + error);
                 }
               )
   }
@@ -121,7 +121,7 @@ class Diecutterlistall extends React.Component {
                 // instead of a catch() block so that we don't swallow
                 // exceptions from actual bugs in components.
                 (error) => {
-                  alert("ERRORE!" + error);
+                  console.log("ERRORE!" + error);
                 }
               )
       }

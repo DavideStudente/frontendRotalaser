@@ -21,7 +21,9 @@ import { withRouter } from 'react-router';
 class Adminview extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {value: '', username: '', isLoaded: false, items: [], diecutterselected:'', customerselected: '', keyA: '', refresh: 0, role: '', diecutters: []};
+    this.state = {value: '', username: '', isLoaded: false, items: [],
+     diecutterselected:'', customerselected: '', keyA: '', refresh: 0, role: '', diecutters: [],
+    customersfiltered:[], diecuttersfiltered:[]};
 
     this.changeCustomer = this.changeCustomer.bind(this);
     this.changeDiecutter = this.changeDiecutter.bind(this);
@@ -29,14 +31,18 @@ class Adminview extends React.Component {
     this.handleSubmit = this.handleSubmit.bind(this);
     this.redirectCreationCustomer=this.redirectCreationCustomer.bind(this);
     this.redirectCreationDieCutter=this.redirectCreationDieCutter.bind(this);
+    this.filterCustomers=this.filterCustomers.bind(this);
+    this.filterDiecutters=this.filterDiecutters.bind(this);
+
   }
 
   componentDidMount () {
     var usern=this.props.match.params.handle;
     this.setState({username: this.props.match.params.handle});
     this.setState({keyA: sessionStorage.getItem('token')});
-    this.setState({role: sessionStorage.getItem('role')})
-    
+    this.setState({role: sessionStorage.getItem('role')});
+     
+
     //const headers = {'key': this.props.location.state };
     const headers = {'key': sessionStorage.getItem('token') };
     if (sessionStorage.getItem('role') == "admin") {
@@ -65,6 +71,7 @@ class Adminview extends React.Component {
                       isLoaded: true,
                       items: result
                     });
+                    this.setState({customersfiltered: this.state.items});   
                     console.log("QUESTI SONO I CUSTOMERS")
                     console.log(result)
                     
@@ -104,6 +111,7 @@ class Adminview extends React.Component {
                 
                       diecutters: result
                     });
+                    this.setState({diecuttersfiltered: result})
                     console.log("QUESTI SONO LE DIECUTTERS ")
                     console.log(result)
                     
@@ -198,6 +206,8 @@ class Adminview extends React.Component {
                   
                         diecutters: result
                       });
+                      this.setState({diecuttersfiltered: result})
+
                       console.log("QUESTI SONO LE DIECUTTERS ")
                       console.log(result)
                       
@@ -222,14 +232,12 @@ class Adminview extends React.Component {
     this.setState({customerselected: event.target.value});
     this.setState({diecutterselected: ''});
     console.log("CHANGED CUSTOMER!");
-    console.log(this.state.customerselected);
   }
 
   changeDiecutter(event){
     this.setState({diecutterselected: event.target.value});
     this.setState({customerselected: ''});
     console.log("CHANGED DieCutter!");
-    console.log(this.state.customerselected);
   }
 
   displayChoose() {
@@ -250,7 +258,7 @@ class Adminview extends React.Component {
 
     else {
       
-      factoriesList.push(<div><b>YOU ARE IN THE OVERVIEW OF THE CUSTOMER WITH ID: {this.state.customerselected}</b> </div>);
+      factoriesList.push(<div><b>YOU ARE IN THE OVERVIEW OF THE CUSTOMER WITH PIVA: {this.state.customerselected} </b> </div>);
       factoriesList.push(<div><FactorylistCustomer customer={this.state.customerselected} history= {this.props.history}/></div>)
       return factoriesList;
       
@@ -267,16 +275,61 @@ class Adminview extends React.Component {
     this.props.history.push({pathname:'/create', state: {element: "diecutter"}});
   }
 
+  filterCustomers(event) {
+    var i;
+    if (event.target.value=='') {
+      this.setState({customersfiltered: this.state.items})
+    }
+    var customersfiltered = []
+   
+    for (i=0; i<this.state.items.length; i++) {
+      if ((this.state.items[i].piva).includes(event.target.value)) {
+        
+        customersfiltered.push(this.state.items[i])
+        
+        
+      }
+    }
+    this.setState({customersfiltered: customersfiltered})
+  }
+
   displayCustomers() {
     var customersList=[];
       var i;
+      customersList.push(<Col><p><input type="text" onChange={this.filterCustomers} />   Search Customers   </p></Col>)
       customersList.push(<Col><p><Button variant="primary" onClick={this.redirectCreationCustomer} > Add Customer</Button></p></Col>)
-      for (i=0 ; i<this.state.items.length; i++) {
-        customersList.push(<Col><p><Button variant="primary" value={this.state.items[i].piva} onClick={this.changeCustomer} > Customer {this.state.items[i].piva}</Button></p></Col>);
+      for (i=0 ; i<this.state.customersfiltered.length; i++) {
+        
+        if (this.state.customerselected==this.state.customersfiltered[i].piva) {
+          customersList.push(<Col><p><Button variant="dark" value={this.state.customersfiltered[i].piva} onClick={this.changeCustomer} > Customer {this.state.customersfiltered[i].piva}</Button></p></Col>);
+        }
+        else {
+          customersList.push(<Col><p><Button variant="primary" value={this.state.customersfiltered[i].piva} onClick={this.changeCustomer} > Customer {this.state.customersfiltered[i].piva}</Button></p></Col>);
+
+        }
         //<Link to={"/factories/"+this.state.items[i].id+"/diecutter"} className="btn btn-primary">Factory {this.state.items[i].id}</Link>
       }
     
     return customersList
+  }
+
+
+  filterDiecutters(event) {
+    var i;
+    if (event.target.value=='') {
+      this.setState({diecuttersfiltered: this.state.diecutters})
+    }
+    var diecuttersfiltered = []
+   
+    for (i=0; i<this.state.diecutters.length; i++) {
+      if ((this.state.diecutters[i].id).includes(event.target.value)) {
+        
+        diecuttersfiltered.push(this.state.diecutters[i])
+        
+        
+      }
+    }
+    this.setState({diecuttersfiltered: diecuttersfiltered})
   }
 
   
@@ -284,10 +337,19 @@ class Adminview extends React.Component {
   displayDiecutters() {
     var diecuttersList=[];
       var i;
+      diecuttersList.push(<Col><p><input type="text" onChange={this.filterDiecutters} />   Search Diecutters   </p></Col>)
+
       diecuttersList.push(<Col><p><Button variant="primary" onClick={this.redirectCreationDieCutter} > Add DieCutter</Button>
       </p></Col>)
-      for (i=0 ; i<this.state.diecutters.length; i++) {
-        diecuttersList.push(<Col><p><Button variant="primary" value={this.state.diecutters[i].id} onClick={this.changeDiecutter} > DieCutter {this.state.diecutters[i].id}</Button></p></Col>);
+      for (i=0 ; i<this.state.diecuttersfiltered.length; i++) {
+        if (this.state.diecutterselected==this.state.diecuttersfiltered[i].id) {
+          diecuttersList.push(<Col><p><Button variant="dark" value={this.state.diecuttersfiltered[i].id} onClick={this.changeDiecutter} > DieCutter {this.state.diecuttersfiltered[i].id}</Button></p></Col>);
+
+        }
+        else {
+          diecuttersList.push(<Col><p><Button variant="primary" value={this.state.diecuttersfiltered[i].id} onClick={this.changeDiecutter} > DieCutter {this.state.diecuttersfiltered[i].id}</Button></p></Col>);
+
+        }
         //<Link to={"/factories/"+this.state.items[i].id+"/diecutter"} className="btn btn-primary">Factory {this.state.items[i].id}</Link>
       }
     /*if (this.state.customerselected=='') {

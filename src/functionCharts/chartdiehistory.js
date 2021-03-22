@@ -90,7 +90,7 @@ function chartdiehistory(diecutterId) {
                 // instead of a catch() block so that we don't swallow
                 // exceptions from actual bugs in components.
                 (error) => {
-                  alert("ERRORE!" + error);
+                  console.log("ERRORE!" + error);
                 }
         )
   console.log("NUOVO VALORE TMPVALUE")
