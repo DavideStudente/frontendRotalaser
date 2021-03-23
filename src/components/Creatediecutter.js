@@ -79,7 +79,7 @@ class Creatediecutter extends React.Component {
         
       };
       console.log(requestOptions)
-      fetch('https://foiadev.diag.uniroma1.it:5002/v1/diecutters', requestOptions)
+      fetch('https://localhost:5002/v1/diecutters', requestOptions)
           .then(response => {
             console.log(response.json())
             if (response.status == 200) {

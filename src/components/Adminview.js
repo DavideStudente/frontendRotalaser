@@ -17,13 +17,18 @@ import {refreshToken} from '../utils/refreshToken';
 import Diecutterlistall from './Diecutterlistall';
 import buttonadd from './addbutton.png'
 import { withRouter } from 'react-router';
+import { faTrashAlt } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
+
+
 
 class Adminview extends React.Component {
   constructor(props) {
     super(props);
     this.state = {value: '', username: '', isLoaded: false, items: [],
      diecutterselected:'', customerselected: '', keyA: '', refresh: 0, role: '', diecutters: [],
-    customersfiltered:[], diecuttersfiltered:[]};
+    customersfiltered:[], diecuttersfiltered:[], reload: false};
 
     this.changeCustomer = this.changeCustomer.bind(this);
     this.changeDiecutter = this.changeDiecutter.bind(this);
@@ -32,6 +37,8 @@ class Adminview extends React.Component {
     this.redirectCreationCustomer=this.redirectCreationCustomer.bind(this);
     this.redirectCreationDieCutter=this.redirectCreationDieCutter.bind(this);
     this.filterCustomers=this.filterCustomers.bind(this);
+    this.deleteDiecutter=this.deleteDiecutter.bind(this);
+    this.deleteCustomer=this.deleteCustomer.bind(this);
     this.filterDiecutters=this.filterDiecutters.bind(this);
 
   }
@@ -46,7 +53,7 @@ class Adminview extends React.Component {
     //const headers = {'key': this.props.location.state };
     const headers = {'key': sessionStorage.getItem('token') };
     if (sessionStorage.getItem('role') == "admin") {
-      fetch("https://foiadev.diag.uniroma1.it:5002/v1/customers", { headers })
+      fetch("https://localhost:5002/v1/customers", { headers })
                 .then(res => 
                   {
                     if (res.status==401) {
@@ -86,7 +93,7 @@ class Adminview extends React.Component {
                 ).then( risultato => {
 
 
-                fetch("https://foiadev.diag.uniroma1.it:5002/v1/diecutters", { headers })
+                fetch("https://localhost:5002/v1/diecutters", { headers })
                 .then(res => 
                   {
                     if (res.status==401) {
@@ -132,7 +139,9 @@ class Adminview extends React.Component {
   }
 
   componentDidUpdate () {
-    if (this.state.keyA!=sessionStorage.getItem('token')) {
+    if (this.state.keyA!=sessionStorage.getItem('token') || this.state.reload==true) {
+      this.setState({reload:false})
+      console.log("STO RICARICANDO I COSI A SEGUITO DI UN ELIMINAZIONE!")
       //console.log("SONO NELL'UPDATE!" + sessionStorage.getItem('token'))
       this.setState({refresh: 0});
       var usern=this.props.match.params.handle;
@@ -142,7 +151,7 @@ class Adminview extends React.Component {
       //const headers = {'key': this.props.location.state };
       const headers = {'key': sessionStorage.getItem('token') };
       if (sessionStorage.getItem('role') == "admin") {
-        fetch("https://foiadev.diag.uniroma1.it:5002/v1/customers", { headers })
+        fetch("https://localhost:5002/v1/customers", { headers })
                 .then(res => 
                   {
                     if (res.status==401) {
@@ -167,6 +176,7 @@ class Adminview extends React.Component {
                       isLoaded: true,
                       items: result
                     });
+                    this.setState({customersfiltered: result})
                     console.log("QUESTI SONO I CUSTOMERS")
                     console.log(result)
                     
@@ -181,7 +191,7 @@ class Adminview extends React.Component {
                 ).then( risultato => {
 
 
-                  fetch("https://foiadev.diag.uniroma1.it:5002/v1/diecutters", { headers })
+                  fetch("https://localhost:5002/v1/diecutters", { headers })
                   .then(res => 
                     {
                       if (res.status==401) {
@@ -239,6 +249,54 @@ class Adminview extends React.Component {
     this.setState({customerselected: ''});
     console.log("CHANGED DieCutter!");
   }
+  deleteDiecutter(){
+    
+    const requestOptions = {
+        method: 'DELETE',
+        headers: {'key': sessionStorage.getItem('token')},
+        
+      };
+      console.log(requestOptions)
+      fetch('https://localhost:5002/v1/diecutters/'+this.state.diecutterselected, requestOptions)
+          .then(response => {
+           
+            this.setState({diecutterselected: ''})
+            this.setState({reload: true})
+            if (response.status == 200) {
+              
+              alert("deleted successfully")
+              
+            }
+            else {
+              alert("c'è stato un errore")
+            }
+          })
+  }
+
+  deleteCustomer(){
+    
+    const requestOptions = {
+        method: 'DELETE',
+        headers: {'key': sessionStorage.getItem('token')},
+        
+      };
+      console.log(requestOptions)
+      fetch('https://localhost:5002/v1/customers/'+this.state.customerselected, requestOptions)
+          .then(response => {
+           
+            this.setState({customerselected: ''})
+            this.setState({reload: true})
+            if (response.status == 200) {
+              
+              alert("deleted successfully")
+              
+            }
+            else {
+              alert("c'è stato un errore")
+            }
+          })
+  }
+
 
   displayChoose() {
     var factoriesList=[];
@@ -249,7 +307,12 @@ class Adminview extends React.Component {
       }
       else {
         
-        factoriesList.push(<div><b>YOU ARE IN THE OVERVIEW OF THE DIECUTTER WITH ID: {this.state.diecutterselected}</b> </div>);
+        factoriesList.push(<Row><Col><b>YOU ARE IN THE OVERVIEW OF THE DIECUTTER WITH ID: {this.state.diecutterselected}</b></Col>
+        <Col xs={1}><button onClick={this.deleteDiecutter}><FontAwesomeIcon
+          icon={faTrashAlt}
+          
+        /></button></Col>
+        </Row>);
         factoriesList.push(<div><Diecutterlistall username={this.state.username} diecutter={this.state.diecutterselected}/></div>)
         return factoriesList;
       }
@@ -258,7 +321,12 @@ class Adminview extends React.Component {
 
     else {
       
-      factoriesList.push(<div><b>YOU ARE IN THE OVERVIEW OF THE CUSTOMER WITH PIVA: {this.state.customerselected} </b> </div>);
+      factoriesList.push(<Row><Col><b>YOU ARE IN THE OVERVIEW OF THE CUSTOMER WITH ID: {this.state.customerselected}</b></Col>
+        <Col xs={1}><button onClick={this.deleteCustomer}><FontAwesomeIcon
+          icon={faTrashAlt}
+          
+        /></button></Col>
+        </Row>);
       factoriesList.push(<div><FactorylistCustomer customer={this.state.customerselected} history= {this.props.history}/></div>)
       return factoriesList;
       
@@ -352,18 +420,7 @@ class Adminview extends React.Component {
         }
         //<Link to={"/factories/"+this.state.items[i].id+"/diecutter"} className="btn btn-primary">Factory {this.state.items[i].id}</Link>
       }
-    /*if (this.state.customerselected=='') {
-      return customersList;
-    }
-
-    else {
-      var customersel=this.state.customerselected;
-      customersList.push(<Col><div><b>YOU ARE IN THE OVERVIEW OF THE CUSTOMER WITH ID: {this.state.customerselected}</b> </div></Col>);
-      customersList.push(<div><FactorylistCustomer customer={this.state.customerselected}/></div>)
-      return customersList;
-       
-      
-    }*/
+   
     return diecuttersList;
   }
 

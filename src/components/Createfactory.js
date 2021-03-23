@@ -62,7 +62,7 @@ class Createcustomer extends React.Component {
         
       };
       console.log(requestOptions)
-      fetch('https://foiadev.diag.uniroma1.it:5002/v1/factories', requestOptions)
+      fetch('https://localhost:5002/v1/factories', requestOptions)
           .then(response => {
             console.log(response.json())
             if (response.status == 200) {
@@ -96,7 +96,7 @@ class Createcustomer extends React.Component {
         </label> <br />
         <label>
           UserId:
-          <input type="text" name="UserId" onChange={this.handleChange}/>
+          <input type="text" name="UserId" value={this.props.UserId} onChange={this.handleChange}/>
         </label> <br />
         <input type="submit" value="Submit" />
       </form>)

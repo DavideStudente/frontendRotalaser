@@ -15,6 +15,7 @@ import Login from './components/Login';
 import Factorylist from './components/Factorylist';
 import Adminview from './components/Adminview';
 import Createview from './components/CreateView';
+import UpdateView from './components/UpdateView';
 
 class App extends React.Component {
   constructor() {
@@ -66,6 +67,7 @@ class App extends React.Component {
             <Route exact path="/details/:handle" component={Diecutterdetails} />
             <Route exact path="/details/:handle/whatif" component={Diecutterwhatif} />
             <Route exact path="/create" component={Createview}/>
+            <Route exact path="/update" component={UpdateView}/>
             
         </div>
       </BrowserRouter>

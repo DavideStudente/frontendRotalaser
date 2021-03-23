@@ -22,7 +22,7 @@ import Creatediecutter from './Creatediecutter';
 import Createuser from './Createuser';
 
 
-class CreateView extends React.Component {
+class UpdateView extends React.Component {
   constructor(props) {
     super(props);
     this.state = {value: '', objecttocreate:''};
@@ -76,4 +76,4 @@ class CreateView extends React.Component {
 
 
 
-export default CreateView;
+export default UpdateView;

@@ -33,7 +33,6 @@ class Createcustomer extends React.Component {
    
     this.setState({username: sessionStorage.getItem('username')});
     this.setState({keyA: sessionStorage.getItem('token')});
-    this.setState({role: sessionStorage.getItem('role')})
     this.setState({CustomerPiva: this.props.customer})
     
   
@@ -51,7 +50,7 @@ class Createcustomer extends React.Component {
 
 
   createCustomerPost(event) {
-    var customer=  JSON.stringify({ id: this.state.id, password: this.state.password, role: this.state.role, CustomerPiva: this.state.CustomerPiva})
+    var customer=  JSON.stringify({ id: this.state.id, password: this.state.password, role: "standard", CustomerPiva: this.state.CustomerPiva})
     
     const requestOptions = {
         method: 'POST',
@@ -60,7 +59,7 @@ class Createcustomer extends React.Component {
         
       };
       console.log(requestOptions)
-      fetch('https://foiadev.diag.uniroma1.it:5002/v1/users', requestOptions)
+      fetch('https://localhost:5002/v1/users', requestOptions)
           .then(response => {
             console.log(response.json())
             if (response.status == 200) {

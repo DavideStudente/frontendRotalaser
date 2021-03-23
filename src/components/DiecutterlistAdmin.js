@@ -11,30 +11,34 @@ import {diecutters} from '../fakedata/data';
 import {factories} from '../fakedata/data';
 import Warninglist from './Warninglist';
 import {refreshToken} from '../utils/refreshToken';
+import { faTrashAlt } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-
-class Diecutterlistall extends React.Component {
+class DiecutterlistAdmin extends React.Component {
   constructor(props) {
     super(props);
     this.state = {value: '',
                   value2: factories[0],
-                  cutterselected: '',
+                  cutterselected: '', reload: false,
                   customerselected: '',
-                  render: '', username: '', keyA: '', factory:'', items: [], isLoaded: false, diecutterprop: ''};
+                  render: '', username: '', keyA: '', factory:'', items: [], isLoaded: false,
+                diecuttersfiltered:[]};
 
-    
+    this.changeCutter = this.changeCutter.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.filterDiecutters = this.filterDiecutters.bind(this);
+    this.deleteDiecutter = this.deleteDiecutter.bind(this);
   }
 
   componentDidMount() {
       this.setState({username: this.props.username});
       this.setState({keyA: sessionStorage.getItem('token')});
-      this.setState({cutterselected: this.props.diecutter})
-      this.setState({diecutterprop: this.props.diecutter})
+      this.setState({factory: this.props.factory});
+      this.setState({customerselected: this.props.customer})
      
       const headers = { 'key': sessionStorage.getItem('token') };
-      fetch("https://localhost:5002/v1/diecutters", { headers })
+      fetch("https://localhost:5002/v1/factories/"+ this.props.factory+"/diecutters", { headers })
                 .then(res => 
                   {
                     if (res.status==401) {
@@ -59,6 +63,8 @@ class Diecutterlistall extends React.Component {
                     isLoaded: true,
                     items: result
                   });
+                  this.setState({diecuttersfiltered: this.state.items})
+
                   //alert('A name was submitted: ' + this.state.items);
                   console.log("DIE CUTTER PERVENUTA");
                   console.log(sessionStorage.getItem('token'));
@@ -78,16 +84,20 @@ class Diecutterlistall extends React.Component {
   
 
   componentDidUpdate() {
-    
-    if ((this.state.cutterselected!=this.props.diecutter || this.state.keyA!=sessionStorage.getItem('token'))  ) {
+    if (this.state.customerselected!=this.props.customer) {
+      this.setState({factory: ''})
+      this.setState({items: [] })
+      this.setState({customerselected: this.props.customer})
+    }
+    if (this.state.factory!=this.props.factory || this.state.keyA!=sessionStorage.getItem('token') || this.state.reload==true) {
+      this.setState({reload: false})
       this.setState({username: this.props.username});
-      this.setState({diecutterprop: this.props.diecutter})
-      this.setState({cutterselected: this.props.diecutter})
+      this.setState({customerselected: this.props.customer})
       this.setState({keyA: sessionStorage.getItem('token')});
-      
+      this.setState({factory: this.props.factory});
       
       const headers = { 'key': sessionStorage.getItem('token') };
-      fetch("https://localhost:5002/v1/diecutters", { headers })
+      fetch("https://localhost:5002/v1/factories/"+ this.props.factory+"/diecutters", { headers })
                 .then(res => 
                   {
                     if (res.status==401) {
@@ -112,6 +122,7 @@ class Diecutterlistall extends React.Component {
                     isLoaded: true,
                     items: result
                   });
+                  this.setState({diecuttersfiltered: result})
                   //alert('A name was submitted: ' + this.state.items);
                  
                   
@@ -128,8 +139,48 @@ class Diecutterlistall extends React.Component {
      
   }
 
+  filterDiecutters(event) {
+    var i;
+    if (event.target.value=='') {
+      this.setState({diecuttersfiltered: this.state.items})
+    }
+    var diecuttersfiltered = []
+   
+    for (i=0; i<this.state.items.length; i++) {
+      if ((this.state.items[i].id).includes(event.target.value)) {
+        
+        diecuttersfiltered.push(this.state.items[i])
+        
+        
+      }
+    }
+    this.setState({diecuttersfiltered: diecuttersfiltered})
+  }
 
-  
+  displayDieCutters() {
+    var dieCuttersList=[];
+    var i;
+    dieCuttersList.push(<Col><p><input type="text" onChange={this.filterDiecutters} />   Search Diecutters   </p></Col>)
+
+    for (i=0 ; i<this.state.diecuttersfiltered.length; i++) {
+      if (this.state.cutterselected==this.state.diecuttersfiltered[i].id) {
+        dieCuttersList.push(<p><Button variant="dark"  value={this.state.diecuttersfiltered[i].id} onClick={this.changeCutter} >DieCutter {this.state.diecuttersfiltered[i].id}  </Button></p>);
+
+      }
+      else {
+        dieCuttersList.push(<p><Button variant="primary"  value={this.state.diecuttersfiltered[i].id} onClick={this.changeCutter} >DieCutter {this.state.diecuttersfiltered[i].id}  </Button></p>);
+
+      }
+    }
+    
+    return dieCuttersList;
+  }
+
+  changeCutter(event){
+    this.setState({cutterselected: event.target.value});
+    //console.log(this.state.cutterselected);
+  }
+
 
   handleChange(event) {
     this.setState({value: event.target.value});
@@ -140,7 +191,64 @@ class Diecutterlistall extends React.Component {
     event.preventDefault();
   }
 
-  
+  deleteDiecutter(){
+    const requestOptions = {
+      method: 'DELETE',
+      headers: {'key': sessionStorage.getItem('token')},
+      
+    };
+    console.log(requestOptions)
+    fetch('https://localhost:5002/v1/diecutters/'+this.state.cutterselected, requestOptions)
+        .then(response => {
+         
+          this.setState({cutterselected: ''})
+          this.setState({reload: true})
+          if (response.status == 200) {
+            
+            alert("deleted successfully")
+            
+          }
+          else {
+            alert("c'è stato un errore")
+          }
+        })
+  }
+  displayWarnings() {
+    var i;
+    var dieCutterWarnings=[]
+    for (i=0; i<this.state.value2.diecutters.length; i++) {
+      var diecutterId=this.state.value2.diecutters[i];
+      var diecutterTmp;
+      
+      for (var y=0; y<diecutters.length; y++) {
+        if (diecutters[y].id==diecutterId) {
+          diecutterTmp=diecutters[y];
+        }
+      }
+      if (diecutterTmp.status == "critical") {
+        dieCutterWarnings.push(<p><Button variant="danger" value={diecutterId} onClick={this.changeCutter} > {diecutterTmp.desc}</Button> </p>)
+      }
+      else if (diecutterTmp.status == "warning") {
+        dieCutterWarnings.push(<p><Button variant="warning" value={diecutterId} onClick={this.changeCutter} > {diecutterTmp.desc}</Button> </p>)
+      }
+      
+    }
+    return dieCutterWarnings;
+  }
+
+  displayDelete() {
+    var buttondelete=[];
+    if (this.state.cutterselected=='') {
+      return buttondelete;
+    }
+    else {
+      buttondelete.push(<Col xs={1.5}><button onClick={this.deleteDiecutter}><FontAwesomeIcon
+        icon={faTrashAlt}
+        
+      /></button></Col>)
+      return buttondelete
+    }
+  }
 
   render() {
     console.log("STO RENDERIZZANDOOO");
@@ -149,8 +257,8 @@ class Diecutterlistall extends React.Component {
     return (
       <Container fluid>
         <Row>
-          <Col style={{backgroundColor: '#B8860B',  border:'2px solid black'}}> <p><Button variant="primary"  value={this.state.cutterselected} >DieCutter {this.state.cutterselected}  </Button></p> </Col>
-          <Col xs={6} style={{backgroundColor: '#BDB76B',  border:'2px solid black'}}><Diecutterinfo dataParentToChild={[cuttersel,1]} username={this.state.username} keyA={this.state.keyA}/></Col>
+          <Col style={{backgroundColor: '#B8860B',  border:'2px solid black'}}>{this.displayDieCutters()} </Col>
+          <Col xs={6} style={{backgroundColor: '#BDB76B',  border:'2px solid black'}}><Row><Col><Diecutterinfo dataParentToChild={[cuttersel,1]} username={this.state.username} keyA={this.state.keyA}/></Col>{this.displayDelete()}</Row></Col>
           <Col style={{backgroundColor: '#B8860B',  border:'2px solid black'}}> <Warninglist username={this.state.username} keyA={this.state.keyA} factory={this.state.factory}/></Col>
         </Row>
       </Container>
@@ -162,4 +270,4 @@ class Diecutterlistall extends React.Component {
 
 
 
-export default Diecutterlistall;
+export default DiecutterlistAdmin;

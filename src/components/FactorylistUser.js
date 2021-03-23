@@ -15,24 +15,21 @@ import DiecutterlistAdmin from './DiecutterlistAdmin';
 import {refreshToken} from '../utils/refreshToken';
 import { faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import  FactorylistUser  from './FactorylistUser';
 
-class FactorylistCustomer extends React.Component {
+
+class FactorylistUser extends React.Component {
   constructor(props) {
     super(props);
     this.state = {value: '', username: '', isLoaded: false, items: [], factoryselected: '', keyA: '', refresh: 0, role: '',
      customerselected: '', users: [], userselected: '', factoriesfiltered: [], usersfiltered:[], reload: false};
 
     this.changeFactory = this.changeFactory.bind(this);
-    this.changeUser = this.changeUser.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.redirectCreationFactory=this.redirectCreationFactory.bind(this);
-    this.redirectCreationUser=this.redirectCreationUser.bind(this);
     this.filterFactories=this.filterFactories.bind(this);
-    this.filterUsers=this.filterUsers.bind(this);
     this.deleteFactory=this.deleteFactory.bind(this);
-    this.deleteUser = this.deleteUser.bind(this);
+    
   }
 
   componentDidMount () {
@@ -44,9 +41,8 @@ class FactorylistCustomer extends React.Component {
     
     //const headers = {'key': this.props.location.state };
     const headers = {'key': sessionStorage.getItem('token') };
-    console.log("https://localhost:5002/v1/customers/"+this.props.customer+"/factories")
     
-      fetch("https://localhost:5002/v1/customers/"+this.props.customer+"/factories", { headers })
+      fetch("https://localhost:5002/v1/users/"+this.props.user+"/factories", { headers })
                 .then(res => 
                   {
                     if (res.status==401) {
@@ -81,48 +77,8 @@ class FactorylistCustomer extends React.Component {
                   (error) => {
                     console.log("ERRORE!" + error);
                   }
-                ).then(res => {
-                  fetch("https://localhost:5002/v1/customers/"+this.props.customer+"/users", { headers })
-                .then(res => 
-                  {
-                    if (res.status==401) {
-                      //console.log("token vecchio e scaduto!" + sessionStorage.getItem('token'));
-                      const newTok=refreshToken(sessionStorage.getItem('refreshToken'));
-                      //sessionStorage.setItem('token', newTok )
-                      //console.log("token nuovo e bellissimo!" + newTok);
-                      //console.log("token nuovo e bellissimo!" + sessionStorage.getItem('token'));
-                      this.setState({keyA: newTok})
-                      return "false";
-                      
-                    }
-                    else {
-                      return res.json()
-                    }
-                  })
-                .then(
-                  (result) => {
-                    console.log("TUTTI GLI USERS")
-                    console.log(result)
-                    if (result == "false") return;
-                    //console.log(result);
-                    this.setState({
-                      isLoaded: true,
-                      users: result
-                    });
-                    this.setState({
-                      usersfiltered: this.state.users
-                    })
-                    
-
-                  },
-                  // Note: it's important to handle errors here
-                  // instead of a catch() block so that we don't swallow
-                  // exceptions from actual bugs in components.
-                  (error) => {
-                    console.log("ERRORE!" + error);
-                  }
                 )
-                })
+                
     
      
   }
@@ -145,7 +101,7 @@ class FactorylistCustomer extends React.Component {
       //const headers = {'key': this.props.location.state };
       const headers = {'key': sessionStorage.getItem('token') };
       
-        fetch("https://localhost:5002/v1/customers/"+this.props.customer+"/factories", { headers })
+        fetch("https://localhost:5002/v1/users/"+this.props.user+"/factories", { headers })
                   .then(res => 
                     {
                       if (res.status==401) {
@@ -180,45 +136,8 @@ class FactorylistCustomer extends React.Component {
                     (error) => {
                       console.log("ERRORE!" + error);
                     }
-                  ).then(res => {
-                    fetch("https://localhost:5002/v1/customers/"+this.props.customer+"/users", { headers })
-                  .then(res => 
-                    {
-                      if (res.status==401) {
-                        //console.log("token vecchio e scaduto!" + sessionStorage.getItem('token'));
-                        const newTok=refreshToken(sessionStorage.getItem('refreshToken'));
-                        //sessionStorage.setItem('token', newTok )
-                        //console.log("token nuovo e bellissimo!" + newTok);
-                        //console.log("token nuovo e bellissimo!" + sessionStorage.getItem('token'));
-                        this.setState({keyA: newTok})
-                        return "false";
-                        
-                      }
-                      else {
-                        return res.json()
-                      }
-                    })
-                  .then(
-                    (result) => {
-                      if (result == "false") return;
-                      //console.log(result);
-                      this.setState({
-                        isLoaded: true,
-                        users: result
-                      });
-                      this.setState({usersfiltered: result})
-                      
-                      
-  
-                    },
-                    // Note: it's important to handle errors here
-                    // instead of a catch() block so that we don't swallow
-                    // exceptions from actual bugs in components.
-                    (error) => {
-                      console.log("ERRORE!" + error);
-                    }
                   )
-                  })
+                  
       
        
      
@@ -233,20 +152,12 @@ class FactorylistCustomer extends React.Component {
     //console.log(this.state.factoryselected);
   }
 
-  changeUser(event){
-    this.setState({userselected: event.target.value});
-    this.setState({factoryselected: ''});
-    //console.log(this.state.factoryselected);
-  }
 
 
   redirectCreationFactory() {
-    this.props.history.push({pathname:'/create', state: {element: "factory", customerId: this.state.customerselected}});
+    this.props.history.push({pathname:'/create', state: {element: "factory", userId: this.props.user}});
   }
 
-  redirectCreationUser() {
-    this.props.history.push({pathname:'/create', state: {element: "user", customerId: this.state.customerselected}});
-  }
 
   filterFactories(event) {
     var i;
@@ -272,7 +183,7 @@ class FactorylistCustomer extends React.Component {
       var i;
       factoriesList.push(<Col><p><input type="text" onChange={this.filterFactories} />   Search Factories   </p></Col>)
 
-      factoriesList.push(<Col><p><Button variant="primary" onClick={this.redirectCreationFactory} > AddFactoryToCustomer</Button></p></Col>)
+      factoriesList.push(<Col><p><Button variant="primary" onClick={this.redirectCreationFactory} > AddFactoryToUser</Button></p></Col>)
 
       for (i=0 ; i<this.state.factoriesfiltered.length; i++) {
         if (this.state.factoryselected == this.state.factoriesfiltered[i].id) {
@@ -313,34 +224,12 @@ class FactorylistCustomer extends React.Component {
           })
   }
 
-  deleteUser(){
-    
-    const requestOptions = {
-        method: 'DELETE',
-        headers: {'key': sessionStorage.getItem('token')},
-        
-      };
-      console.log(requestOptions)
-      fetch('https://localhost:5002/v1/users/'+this.state.userselected, requestOptions)
-          .then(response => {
-           
-            this.setState({userselected: ''})
-            this.setState({reload: true})
-            if (response.status == 200) {
-              
-              alert("deleted successfully")
-              
-            }
-            else {
-              alert("c'è stato un errore")
-            }
-          })
-  }
+ 
 
   displayChoose() {
     var factoriesList=[];
     
-    if (this.state.userselected=='') {
+    
       if (this.state.factoryselected=='') {
         return factoriesList;
       }
@@ -356,67 +245,13 @@ class FactorylistCustomer extends React.Component {
         factoriesList.push(<div><DiecutterlistAdmin customer={this.state.customerselected} username={this.state.username} keyA={this.state.keyA} factory={this.state.factoryselected}/></div>)
         return factoriesList;
       }
-      
      
-    }
-
-    else {
-      
-      factoriesList.push(<Row><Col><b>YOU ARE IN THE OVERVIEW OF THE USER WITH USERNAME: {this.state.userselected}</b></Col>
-        <Col xs={1}><button onClick={this.deleteUser}><FontAwesomeIcon
-          icon={faTrashAlt}
-          
-        /></button></Col>
-        </Row>);
-      //TODO list the factories of the users
-      factoriesList.push(<div><FactorylistUser user={this.state.userselected} username={this.state.username} keyA={this.state.keyA} history={this.props.history}/></div>)
-
-      return factoriesList;
-      
-      
-    }
-  }
-
-  filterUsers(event) {
-    var i;
-    if (event.target.value=='') {
-      this.setState({usersfiltered: this.state.users})
-    }
-    var usersfiltered = []
-   
-    for (i=0; i<this.state.users.length; i++) {
-      if ((this.state.users[i].id).includes(event.target.value)) {
-        
-        usersfiltered.push(this.state.users[i])
-        
-        
-      }
-    }
-    this.setState({usersfiltered: usersfiltered})
-  }
-
-  displayUsers() {
-    var usersList=[];
-    var i;
-    usersList.push(<Col><p><input type="text" onChange={this.filterUsers} />   Search Users   </p></Col>)
-
-    usersList.push(<Col><p><Button variant="primary" onClick={this.redirectCreationUser} > AddUserToCustomer</Button></p></Col>)
-
-    for (i=0 ; i<this.state.usersfiltered.length; i++) {
-      if (this.state.userselected==this.state.usersfiltered[i].id) {
-        usersList.push(<Col><p><Button variant="dark" value={this.state.usersfiltered[i].id} onClick={this.changeUser} > User {this.state.usersfiltered[i].id}</Button></p></Col>);
-
-      }
-      else {
-        usersList.push(<Col><p><Button variant="primary" value={this.state.usersfiltered[i].id} onClick={this.changeUser} > User {this.state.usersfiltered[i].id}</Button></p></Col>);
-
-      }
-      //<Link to={"/factories/"+this.state.items[i].id+"/diecutter"} className="btn btn-primary">Factory {this.state.items[i].id}</Link>
-    }
     
-    return usersList 
+
+    
   }
 
+  
 
 
   handleChange(event) {
@@ -438,7 +273,7 @@ class FactorylistCustomer extends React.Component {
       <Container fluid>
         <Row>
           <Col style={{backgroundColor: '#B8860B',  border:'2px solid black'}}>{this.displayFactories()} </Col>
-          <Col style={{backgroundColor: '#B8860B',  border:'2px solid black'}}>{this.displayUsers()} </Col>
+          
     
         </Row>
         <Row>
@@ -453,4 +288,4 @@ class FactorylistCustomer extends React.Component {
 
 
 
-export default FactorylistCustomer;
+export default FactorylistUser;

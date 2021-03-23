@@ -235,8 +235,6 @@ class Factorylist extends React.Component {
       var i;
       factoriesList.push(<Col><p><input type="text" onChange={this.filterFactories} />   Search Factories   </p></Col>)
 
-      factoriesList.push(<Col><p><Button variant="primary" onClick={this.redirectCreationFactory} > AddFactoryToCustomer</Button></p></Col>)
-
       for (i=0 ; i<this.state.factoriesfiltered.length; i++) {
         if (this.state.factoryselected == this.state.factoriesfiltered[i].id) {
           factoriesList.push(<Col><p><Button variant="dark" value={this.state.factoriesfiltered[i].id} onClick={this.changeFactory} > Factory {this.state.factoriesfiltered[i].id}</Button></p></Col>);
