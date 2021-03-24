@@ -34,7 +34,48 @@ class Creatediecutter extends React.Component {
     this.setState({username: sessionStorage.getItem('username')});
     this.setState({keyA: sessionStorage.getItem('token')});
     this.setState({role: sessionStorage.getItem('role')})
-    
+    const headers = {'key': sessionStorage.getItem('token') };
+    if (sessionStorage.getItem('role') == "admin") {
+      fetch("https://foiadev.diag.uniroma1.it:5002/v1/diecutters/"+this.props.diecutter, { headers })
+                .then(res => 
+                  {
+                    if (res.status==401) {
+                      //console.log("token vecchio e scaduto!" + sessionStorage.getItem('token'));
+                      const newTok=refreshToken(sessionStorage.getItem('refreshToken'));
+                      //sessionStorage.setItem('token', newTok )
+                      //console.log("token nuovo e bellissimo!" + newTok);
+                      //console.log("token nuovo e bellissimo!" + sessionStorage.getItem('token'));
+                      this.setState({keyA: newTok})
+                      return "false";
+                      
+                    }
+                    else {
+                      return res.json()
+                    }
+                  })
+                .then(
+                  (result) => {
+                    console.log(result)
+                    if (result == "false") return;
+                    //console.log(result);
+                    this.setState({diecutterGet: result})
+                    this.setState({piva: result.piva })
+                    this.setState({name: result.name})
+                    this.setState({surname: result.surname})
+                  
+                      
+
+                  },
+                  // Note: it's important to handle errors here
+                  // instead of a catch() block so that we don't swallow
+                  // exceptions from actual bugs in components.
+                  (error) => {
+                    console.log("ERRORE!" + error);
+                  }
+                
+                
+                )
+    }
   
   }
 

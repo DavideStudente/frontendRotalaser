@@ -20,6 +20,10 @@ import Createcustomer from './Createcustomer';
 import Createfactory from './Createfactory';
 import Creatediecutter from './Creatediecutter';
 import Createuser from './Createuser';
+import Updatecustomer from './Updatecustomer';
+import Updatefactory from './Updatefactory';
+import Updatediecutter from './Updatediecutter';
+import Updateuser from './Updateuser';
 
 
 class UpdateView extends React.Component {
@@ -41,18 +45,18 @@ class UpdateView extends React.Component {
   
   displayCreation() {
     if (this.state.objecttocreate=="customer") {
-        return (<Createcustomer history={this.props.history}/>)
+        return (<Updatecustomer history={this.props.history} customerId={this.props.location.state.customerId}/>)
     }
     if (this.state.objecttocreate=="factory") {
       
-      return (<Createfactory customer={this.props.location.state.customerId} history={this.props.history} UserId={this.props.location.state.userId}/>)
+      return (<Updatefactory customer={this.props.location.state.customerId} history={this.props.history} UserId={this.props.location.state.userId}/>)
     }
     if (this.state.objecttocreate=="diecutter") {
-      return (<Creatediecutter history={this.props.history}/>)
+      return (<Updatediecutter history={this.props.history} diecutter={this.props.diecutter}/>)
 
     }
     if (this.state.objecttocreate=="user"){
-      return (<Createuser history={this.props.history} customer={this.props.location.state.customerId}/>)
+      return (<Updateuser history={this.props.history} customer={this.props.location.state.customerId}/>)
     }
   }
 

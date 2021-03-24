@@ -18,6 +18,7 @@ import Diecutterlistall from './Diecutterlistall';
 import buttonadd from './addbutton.png'
 import { withRouter } from 'react-router';
 import { faTrashAlt } from "@fortawesome/free-solid-svg-icons";
+import { faPen } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 
@@ -36,6 +37,7 @@ class Adminview extends React.Component {
     this.handleSubmit = this.handleSubmit.bind(this);
     this.redirectCreationCustomer=this.redirectCreationCustomer.bind(this);
     this.redirectCreationDieCutter=this.redirectCreationDieCutter.bind(this);
+    this.redirectUpdateCustomer=this.redirectUpdateCustomer.bind(this);
     this.filterCustomers=this.filterCustomers.bind(this);
     this.deleteDiecutter=this.deleteDiecutter.bind(this);
     this.deleteCustomer=this.deleteCustomer.bind(this);
@@ -53,7 +55,7 @@ class Adminview extends React.Component {
     //const headers = {'key': this.props.location.state };
     const headers = {'key': sessionStorage.getItem('token') };
     if (sessionStorage.getItem('role') == "admin") {
-      fetch("https://localhost:5002/v1/customers", { headers })
+      fetch("https://foiadev.diag.uniroma1.it:5002/v1/customers", { headers })
                 .then(res => 
                   {
                     if (res.status==401) {
@@ -93,7 +95,7 @@ class Adminview extends React.Component {
                 ).then( risultato => {
 
 
-                fetch("https://localhost:5002/v1/diecutters", { headers })
+                fetch("https://foiadev.diag.uniroma1.it:5002/v1/diecutters", { headers })
                 .then(res => 
                   {
                     if (res.status==401) {
@@ -151,7 +153,7 @@ class Adminview extends React.Component {
       //const headers = {'key': this.props.location.state };
       const headers = {'key': sessionStorage.getItem('token') };
       if (sessionStorage.getItem('role') == "admin") {
-        fetch("https://localhost:5002/v1/customers", { headers })
+        fetch("https://foiadev.diag.uniroma1.it:5002/v1/customers", { headers })
                 .then(res => 
                   {
                     if (res.status==401) {
@@ -191,7 +193,7 @@ class Adminview extends React.Component {
                 ).then( risultato => {
 
 
-                  fetch("https://localhost:5002/v1/diecutters", { headers })
+                  fetch("https://foiadev.diag.uniroma1.it:5002/v1/diecutters", { headers })
                   .then(res => 
                     {
                       if (res.status==401) {
@@ -257,7 +259,7 @@ class Adminview extends React.Component {
         
       };
       console.log(requestOptions)
-      fetch('https://localhost:5002/v1/diecutters/'+this.state.diecutterselected, requestOptions)
+      fetch('https://foiadev.diag.uniroma1.it:5002/v1/diecutters/'+this.state.diecutterselected, requestOptions)
           .then(response => {
            
             this.setState({diecutterselected: ''})
@@ -281,7 +283,7 @@ class Adminview extends React.Component {
         
       };
       console.log(requestOptions)
-      fetch('https://localhost:5002/v1/customers/'+this.state.customerselected, requestOptions)
+      fetch('https://foiadev.diag.uniroma1.it:5002/v1/customers/'+this.state.customerselected, requestOptions)
           .then(response => {
            
             this.setState({customerselected: ''})
@@ -322,7 +324,12 @@ class Adminview extends React.Component {
     else {
       
       factoriesList.push(<Row><Col><b>YOU ARE IN THE OVERVIEW OF THE CUSTOMER WITH ID: {this.state.customerselected}</b></Col>
-        <Col xs={1}><button onClick={this.deleteCustomer}><FontAwesomeIcon
+       
+        <Col xs={1}><button onClick={this.redirectUpdateCustomer} ><FontAwesomeIcon
+          icon={faPen} 
+          
+        /></button></Col>
+         <Col xs={1}><button onClick={this.deleteCustomer}><FontAwesomeIcon
           icon={faTrashAlt}
           
         /></button></Col>
@@ -337,6 +344,11 @@ class Adminview extends React.Component {
   redirectCreationCustomer(){
 
     this.props.history.push({pathname:'/create', state: {element: "customer"}});
+  }
+  
+  redirectUpdateCustomer(){
+
+    this.props.history.push({pathname:'/update', state: {element: "customer", customerId: this.state.customerselected}});
   }
 
   redirectCreationDieCutter() {

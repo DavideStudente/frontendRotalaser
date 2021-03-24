@@ -17,16 +17,16 @@ import {refreshToken} from '../utils/refreshToken';
 import Diecutterlistall from './Diecutterlistall';
 import buttonadd from './addbutton.png'
 
-class Createcustomer extends React.Component {
+class Updatecustomer extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {value: '', username: '', isLoaded: false, items: [],  keyA: '', piva: '', name:'', surname:''};
+    this.state = {value: '', username: '', isLoaded: false,  keyA: '', piva: '', name:'', surname:'', customerId:''};
 
     
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.displayCustomer = this.displayCustomer.bind(this);
-    this.createCustomerPost = this.createCustomerPost.bind(this);
+    this.createCustomerUpdate = this.createCustomerUpdate.bind(this);
   }
 
   componentDidMount () {
@@ -34,11 +34,12 @@ class Createcustomer extends React.Component {
     this.setState({username: sessionStorage.getItem('username')});
     this.setState({keyA: sessionStorage.getItem('token')});
     this.setState({role: sessionStorage.getItem('role')})
+    this.setState({customerId: this.props.customerId});
     
     //const headers = {'key': this.props.location.state };
     const headers = {'key': sessionStorage.getItem('token') };
     if (sessionStorage.getItem('role') == "admin") {
-      fetch("https://foiadev.diag.uniroma1.it:5002/v1/customers", { headers })
+      fetch("https://foiadev.diag.uniroma1.it:5002/v1/customers/"+this.props.customerId, { headers })
                 .then(res => 
                   {
                     if (res.status==401) {
@@ -57,15 +58,15 @@ class Createcustomer extends React.Component {
                   })
                 .then(
                   (result) => {
+                    console.log(result)
                     if (result == "false") return;
                     //console.log(result);
-                    this.setState({
-                      isLoaded: true,
-                      items: result
-                    });
-                    console.log("QUESTI SONO I CUSTOMERS")
-                    console.log(result)
-                    
+                    this.setState({customerGet: result})
+                    this.setState({piva: result.piva })
+                    this.setState({name: result.name})
+                    this.setState({surname: result.surname})
+                  
+                      
 
                   },
                   // Note: it's important to handle errors here
@@ -98,17 +99,17 @@ class Createcustomer extends React.Component {
   }
 
 
-  createCustomerPost(event) {
+  createCustomerUpdate(event) {
     var customer=  JSON.stringify({ piva: this.state.piva, name: this.state.name, surname: this.state.surname})
     var bodycustomer = (JSON.stringify({customer: customer}))
     const requestOptions = {
-        method: 'POST',
+        method: 'PUT',
         headers: {'key': sessionStorage.getItem('token'), 'Content-Type': 'application/json'},
         body: JSON.stringify({ piva: this.state.piva, name: this.state.name, surname: this.state.surname})
         
       };
       console.log(requestOptions)
-      fetch('https://foiadev.diag.uniroma1.it:5002/v1/customers', requestOptions)
+      fetch('https://foiadev.diag.uniroma1.it:5002/v1/customers/'+this.props.customerId, requestOptions)
           .then(response => {
             console.log(response.json())
             if (response.status == 200) {
@@ -128,18 +129,18 @@ class Createcustomer extends React.Component {
     
     var customerList=[];
     customerList.push(<div><b>Creation Customer</b></div>)
-    customerList.push(<form onSubmit={this.createCustomerPost}>
+    customerList.push(<form onSubmit={this.createCustomerUpdate}>
         <label>
           piva:    
-          <input type="text" name="piva" onChange={this.handleChange} />
+          <input type="text" name="piva" value={this.state.piva} onChange={this.handleChange} />
         </label> <br />
         <label>
           name:
-          <input type="text" name="name" onChange={this.handleChange}/>
+          <input type="text" name="name" value={this.state.name} onChange={this.handleChange}/>
         </label> <br />
         <label>
           surname:
-          <input type="text" name="surname" onChange={this.handleChange}/>
+          <input type="text" name="surname" value={this.state.surname} onChange={this.handleChange}/>
         </label> <br />
         <input type="submit" value="Submit" />
       </form>)
@@ -182,4 +183,4 @@ class Createcustomer extends React.Component {
 
 
 
-export default Createcustomer;
+export default Updatecustomer;
