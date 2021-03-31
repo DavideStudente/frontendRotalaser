@@ -12,16 +12,23 @@ import {factories} from '../fakedata/data';
 import {Link} from 'react-router-dom';
 import Diecutterlist from './Diecutterlist';
 import {refreshToken} from '../utils/refreshToken';
+import { Pagination } from 'react-bootstrap';
+
+
+
+const numberOfelement=5;
 
 
 class Factorylist extends React.Component {
   constructor(props) {
     super(props);
     this.state = {value: '', username: '', isLoaded: false, items: [], factoryselected: '', keyA: '', refresh: 0, role: '',
+    factorypageselected:1,
     factoriesfiltered: []};
 
     this.changeFactory = this.changeFactory.bind(this);
     this.handleChange = this.handleChange.bind(this);
+    this.handlePagChange = this.handlePagChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.filterFactories = this.filterFactories.bind(this);
   }
@@ -35,7 +42,7 @@ class Factorylist extends React.Component {
     //const headers = {'key': this.props.location.state };
     const headers = {'key': sessionStorage.getItem('token') };
     if (sessionStorage.getItem('role') == "admin") {
-      fetch("https://foiadev.diag.uniroma1.it:5002/v1/factories", { headers })
+      fetch("https://localhost:5002/v1/factories", { headers })
                 .then(res => 
                   {
                     if (res.status==401) {
@@ -73,7 +80,7 @@ class Factorylist extends React.Component {
                 )
     }
     else {
-      fetch("https://foiadev.diag.uniroma1.it:5002/v1/users/"+ usern +"/factories", { headers })
+      fetch("https://localhost:5002/v1/users/"+ usern +"/factories", { headers })
               .then(res => 
                 {
                   if (res.status==401) {
@@ -126,7 +133,7 @@ class Factorylist extends React.Component {
       //const headers = {'key': this.props.location.state };
       const headers = {'key': sessionStorage.getItem('token') };
       if (sessionStorage.getItem('role') == "admin") {
-        fetch("https://foiadev.diag.uniroma1.it:5002/v1/factories", { headers })
+        fetch("https://localhost:5002/v1/factories", { headers })
                 .then(res => 
                   {
                     if (res.status==401) {
@@ -164,7 +171,7 @@ class Factorylist extends React.Component {
                 )
       }
       else {
-        fetch("https://foiadev.diag.uniroma1.it:5002/v1/users/"+ usern +"/factories", { headers })
+        fetch("https://localhost:5002/v1/users/"+ usern +"/factories", { headers })
                 .then(res => 
                   {
                     if (res.status==401) {
@@ -229,13 +236,87 @@ class Factorylist extends React.Component {
     this.setState({factoriesfiltered: factoriesfiltered})
   }
 
+  handlePagChange(event) {
+    
+    
+    if (event.target.type.includes("factory") ) {
+      console.log(this.state.factorypageselected)
+      if (event.target.type == "prevfactory") {
+        if (this.state.factorypageselected != 1) {
+          
+          this.setState({factorypageselected: this.state.factorypageselected-1})
+        }
+        
+      }
+      else if (event.target.type == "nextfactory") {
+      
+        if (this.state.factorypageselected != Math.ceil((this.state.factoriesfiltered.length)/numberOfelement)) {
+          
+          this.setState({factorypageselected: this.state.factorypageselected+1})
+        }
+      }
+      else {
+        
+        this.setState({factorypageselected: parseInt(event.target.text)})
+      }
+      
+    }
+    
+
+    
+    
+  }
+
+  paginationInit(length, pageselected, element) {
+    let active = 2;
+    let items = [];
+    length=Math.ceil(length)
+    
+    if (length <= 1) {
+      return items
+    }
+    items.push(<Pagination.Item type={"prev"+element.toString()}  onClick={this.handlePagChange}>{"<"}</Pagination.Item>)
+
+    
+    for (let number = 1; number <= length; number++) {
+      
+      if (number==pageselected) {
+        
+        items.push(
+          <Pagination.Item active>
+            {number}
+          </Pagination.Item>,
+        );
+      }
+      else {
+        items.push(
+          <Pagination.Item type={element} onClick={this.handlePagChange}>
+            {number}
+          </Pagination.Item>,
+        );
+      }
+      
+    }
+    items.push(<Pagination.Item type={"next"+element.toString()}  onClick={this.handlePagChange}>{">"}</Pagination.Item>)
+
+    return items
+    //this.setState({pagesdiecutter: items})
+  }
 
   displayFactories() {
     var factoriesList=[];
       var i;
       factoriesList.push(<Col><p><input type="text" onChange={this.filterFactories} />   Search Factories   </p></Col>)
 
-      for (i=0 ; i<this.state.factoriesfiltered.length; i++) {
+      var firsttoshow = (this.state.factorypageselected-1)*numberOfelement
+      var maxindex
+      if (firsttoshow+numberOfelement>this.state.factoriesfiltered.length) {
+        maxindex=this.state.factoriesfiltered.length;
+      }
+      else {
+        maxindex=firsttoshow+numberOfelement;
+      }
+      for (i=firsttoshow ; i<maxindex; i++) {
         if (this.state.factoryselected == this.state.factoriesfiltered[i].id) {
           factoriesList.push(<Col><p><Button variant="dark" value={this.state.factoriesfiltered[i].id} onClick={this.changeFactory} > Factory {this.state.factoriesfiltered[i].id}</Button></p></Col>);
 
@@ -246,33 +327,30 @@ class Factorylist extends React.Component {
         }
         //<Link to={"/factories/"+this.state.items[i].id+"/diecutter"} className="btn btn-primary">Factory {this.state.items[i].id}</Link>
       }
-      if (this.state.factoryselected=='') {
-        return factoriesList;
-      }
-  
-      else {
-        var factorysel=this.state.factoryselected;
-        factoriesList.push(<Col><div><b>YOU ARE IN THE OVERVIEW OF THE FACTORY WITH ID: {this.state.factoryselected}</b> </div></Col>);
-        factoriesList.push(<div><Diecutterlist username={this.state.username} keyA={this.state.keyA} factory={this.state.factoryselected}/></div>)
-        return factoriesList;
-         
-        
-      }
-    /*if (this.state.factoryselected=='') {
+      
+    return factoriesList
+  }
+
+  displayChoose() {
+    var factoriesList=[];
+    
+    if (this.state.factoryselected=='') {
       return factoriesList;
     }
 
     else {
       var factorysel=this.state.factoryselected;
       factoriesList.push(<Col><div><b>YOU ARE IN THE OVERVIEW OF THE FACTORY WITH ID: {this.state.factoryselected}</b> </div></Col>);
-      factoriesList.push(<div><Diecutterlist customer={this.state.customerselected} username={this.state.username} keyA={this.state.keyA} factory={this.state.factoryselected}/></div>)
+      factoriesList.push(<div><Diecutterlist username={this.state.username} keyA={this.state.keyA} factory={this.state.factoryselected}/></div>)
       return factoriesList;
        
       
-    }*/
-    return factoriesList
-  }
+    }
+     
+    
 
+    
+  }
   
 
 
@@ -295,9 +373,16 @@ class Factorylist extends React.Component {
     return (
       <Container fluid>
         <Row>
-          <Col style={{backgroundColor: '#B8860B',  border:'2px solid black'}}>{this.displayFactories()} </Col>
+          <Col style={{backgroundColor: '#B8860B',  border:'2px solid black'}}>{this.displayFactories()} 
+          <Pagination size="sm">
+            {this.paginationInit((this.state.factoriesfiltered.length)/numberOfelement, this.state.factorypageselected, "factory")}
+            </Pagination>
+          </Col>
+    
+          
           
         </Row>
+        <Row>{this.displayChoose()}</Row>
       </Container>
       
     );

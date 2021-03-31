@@ -26,7 +26,7 @@ class Createcustomer extends React.Component {
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.displayCustomer = this.displayCustomer.bind(this);
-    this.createCustomerPost = this.createCustomerPost.bind(this);
+    this.createUserUpdate = this.createUserUpdate.bind(this);
   }
 
   componentDidMount () {
@@ -34,9 +34,51 @@ class Createcustomer extends React.Component {
     this.setState({username: sessionStorage.getItem('username')});
     this.setState({keyA: sessionStorage.getItem('token')});
     this.setState({CustomerPiva: this.props.customer})
+    const headers = {'key': sessionStorage.getItem('token') };
+   if (sessionStorage.getItem('role') == "admin") {
+     console.log("https://localhost:5002/v1/users/"+this.props.userId)
+     fetch("https://localhost:5002/v1/users/"+this.props.userId, { headers })
+               .then(res => 
+                 {
+                   if (res.status==401) {
+                     //console.log("token vecchio e scaduto!" + sessionStorage.getItem('token'));
+                     const newTok=refreshToken(sessionStorage.getItem('refreshToken'));
+                     //sessionStorage.setItem('token', newTok )
+                     //console.log("token nuovo e bellissimo!" + newTok);
+                     //console.log("token nuovo e bellissimo!" + sessionStorage.getItem('token'));
+                     this.setState({keyA: newTok})
+                     return "false";
+                     
+                   }
+                   else {
+                     return res.json()
+                   }
+                 })
+               .then(
+                 (result) => {
+                   console.log(result)
+                   if (result == "false") return;
+                   //console.log(result);
+                   this.setState({userGET: result})
+                   this.setState({id: result.id })
+                   this.setState({password: false})
+                 
+                     
+
+                 },
+                 // Note: it's important to handle errors here
+                 // instead of a catch() block so that we don't swallow
+                 // exceptions from actual bugs in components.
+                 (error) => {
+                   console.log("ERRORE!" + error);
+                 }
+               
+               
+               )
+   }
+   
     
-  
-  }
+ }
 
   handleChange(event) {
       if (event.target.name=="id") {
@@ -49,17 +91,22 @@ class Createcustomer extends React.Component {
   }
 
 
-  createCustomerPost(event) {
-    var customer=  JSON.stringify({ id: this.state.id, password: this.state.password, role: "standard", CustomerPiva: this.state.CustomerPiva})
+  createUserUpdate(event) {
+    if (this.state.password==false) {
+      var user=  JSON.stringify({ id: this.state.id})
+    }
+    else {
+      var user=  JSON.stringify({ id: this.state.id, password: this.state.password})
+    }
     
     const requestOptions = {
-        method: 'POST',
+        method: 'PUT',
         headers: {'key': sessionStorage.getItem('token'), 'Content-Type': 'application/json'},
-        body: customer
+        body: user
         
       };
       console.log(requestOptions)
-      fetch('https://foiadev.diag.uniroma1.it:5002/v1/users', requestOptions)
+      fetch('https://localhost:5002/v1/users/'+this.props.userId, requestOptions)
           .then(response => {
             console.log(response.json())
             if (response.status == 200) {
@@ -82,10 +129,10 @@ class Createcustomer extends React.Component {
     
     var customerList=[];
     customerList.push(<div><b>Creation User</b></div>)
-    customerList.push(<form onSubmit={this.createCustomerPost}>
+    customerList.push(<form onSubmit={this.createUserUpdate}>
         <label>
           username:    
-          <input type="text" name="id" onChange={this.handleChange} />
+          <input type="text" name="id" value={this.state.id} onChange={this.handleChange} />
         </label> <br />
         <label>
           password:

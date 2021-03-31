@@ -26,7 +26,7 @@ class Createcustomer extends React.Component {
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.displayCustomer = this.displayCustomer.bind(this);
-    this.createCustomerPost = this.createCustomerPost.bind(this);
+    this.createFactoryUpdate = this.createFactoryUpdate.bind(this);
   }
 
   componentDidMount () {
@@ -37,7 +37,53 @@ class Createcustomer extends React.Component {
     this.setState({UserId: this.props.UserId})
     
   
-  }
+   //const headers = {'key': this.props.location.state };
+   const headers = {'key': sessionStorage.getItem('token') };
+   if (sessionStorage.getItem('role') == "admin") {
+     console.log("https://localhost:5002/v1/factories/"+this.props.factoryId)
+     fetch("https://localhost:5002/v1/factories/"+this.props.factoryId, { headers })
+               .then(res => 
+                 {
+                   if (res.status==401) {
+                     //console.log("token vecchio e scaduto!" + sessionStorage.getItem('token'));
+                     const newTok=refreshToken(sessionStorage.getItem('refreshToken'));
+                     //sessionStorage.setItem('token', newTok )
+                     //console.log("token nuovo e bellissimo!" + newTok);
+                     //console.log("token nuovo e bellissimo!" + sessionStorage.getItem('token'));
+                     this.setState({keyA: newTok})
+                     return "false";
+                     
+                   }
+                   else {
+                     return res.json()
+                   }
+                 })
+               .then(
+                 (result) => {
+                   console.log(result)
+                   if (result == "false") return;
+                   //console.log(result);
+                   this.setState({factoryGet: result})
+                   this.setState({id: result.id })
+                   this.setState({location: result.location})
+                   this.setState({UserId: result.UserId})
+                 
+                     
+
+                 },
+                 // Note: it's important to handle errors here
+                 // instead of a catch() block so that we don't swallow
+                 // exceptions from actual bugs in components.
+                 (error) => {
+                   console.log("ERRORE!" + error);
+                 }
+               
+               
+               )
+   }
+   
+    
+ }
 
   handleChange(event) {
       if (event.target.name=="id") {
@@ -53,17 +99,17 @@ class Createcustomer extends React.Component {
   }
 
 
-  createCustomerPost(event) {
+  createFactoryUpdate(event) {
     var customer=  JSON.stringify({ id: this.state.id, location: this.state.location, UserId: this.state.UserId, CustomerPiva: this.props.customer})
     
     const requestOptions = {
-        method: 'POST',
+        method: 'PUT',
         headers: {'key': sessionStorage.getItem('token'), 'Content-Type': 'application/json'},
         body: customer
         
       };
       console.log(requestOptions)
-      fetch('https://foiadev.diag.uniroma1.it:5002/v1/factories', requestOptions)
+      fetch('https://localhost:5002/v1/factories/'+this.props.factoryId, requestOptions)
           .then(response => {
             console.log(response.json())
             if (response.status == 200) {
@@ -85,19 +131,19 @@ class Createcustomer extends React.Component {
     
     
     var customerList=[];
-    customerList.push(<div><b>Creation Factory</b></div>)
-    customerList.push(<form onSubmit={this.createCustomerPost}>
+    customerList.push(<div><b>Update Factory</b></div>)
+    customerList.push(<form onSubmit={this.createFactoryUpdate}>
         <label>
           id:    
-          <input type="text" name="id" onChange={this.handleChange} />
+          <input type="text" name="id" value={this.state.id} onChange={this.handleChange} />
         </label> <br />
         <label>
           location:
-          <input type="text" name="location" onChange={this.handleChange}/>
+          <input type="text" name="location" value={this.state.location} onChange={this.handleChange}/>
         </label> <br />
         <label>
           UserId:
-          <input type="text" name="UserId" value={this.props.UserId} onChange={this.handleChange}/>
+          <input type="text" name="UserId" value={this.state.UserId} onChange={this.handleChange}/>
         </label> <br />
         <input type="submit" value="Submit" />
       </form>)

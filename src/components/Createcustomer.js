@@ -38,7 +38,7 @@ class Createcustomer extends React.Component {
     //const headers = {'key': this.props.location.state };
     const headers = {'key': sessionStorage.getItem('token') };
     if (sessionStorage.getItem('role') == "admin") {
-      fetch("https://foiadev.diag.uniroma1.it:5002/v1/customers", { headers })
+      fetch("https://localhost:5002/v1/customers", { headers })
                 .then(res => 
                   {
                     if (res.status==401) {
@@ -108,7 +108,7 @@ class Createcustomer extends React.Component {
         
       };
       console.log(requestOptions)
-      fetch('https://foiadev.diag.uniroma1.it:5002/v1/customers', requestOptions)
+      fetch('https://localhost:5002/v1/customers', requestOptions)
           .then(response => {
             console.log(response.json())
             if (response.status == 200) {

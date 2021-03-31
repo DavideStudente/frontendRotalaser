@@ -26,7 +26,7 @@ class Creatediecutter extends React.Component {
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.displayCustomer = this.displayCustomer.bind(this);
-    this.createCustomerPost = this.createCustomerPost.bind(this);
+    this.createDiecutterUpdate = this.createDiecutterUpdate.bind(this);
   }
 
   componentDidMount () {
@@ -35,8 +35,9 @@ class Creatediecutter extends React.Component {
     this.setState({keyA: sessionStorage.getItem('token')});
     this.setState({role: sessionStorage.getItem('role')})
     const headers = {'key': sessionStorage.getItem('token') };
+    console.log("https://localhost:5002/v1/diecutters/"+this.props.diecutterId)
     if (sessionStorage.getItem('role') == "admin") {
-      fetch("https://foiadev.diag.uniroma1.it:5002/v1/diecutters/"+this.props.diecutter, { headers })
+      fetch("https://localhost:5002/v1/diecutters/"+this.props.diecutterId, { headers })
                 .then(res => 
                   {
                     if (res.status==401) {
@@ -59,9 +60,9 @@ class Creatediecutter extends React.Component {
                     if (result == "false") return;
                     //console.log(result);
                     this.setState({diecutterGet: result})
-                    this.setState({piva: result.piva })
-                    this.setState({name: result.name})
-                    this.setState({surname: result.surname})
+                    this.setState({id: result.id })
+                    this.setState({FactoryId: result.FactoryId})
+                    this.setState({cadfile: result.cadfile})
                   
                       
 
@@ -83,6 +84,7 @@ class Creatediecutter extends React.Component {
   handleChange(event) {
       if (event.target.name=="id") {
           this.setState({id: event.target.value})
+          
       }
       if (event.target.name=="FactoryId") {
           this.setState({FactoryId: event.target.value})
@@ -110,17 +112,17 @@ class Creatediecutter extends React.Component {
   }
 
 
-  createCustomerPost(event) {
-    var customer=  JSON.stringify({ id: this.state.id, FactoryId: this.state.FactoryId, cadfile: this.state.cadfile})
+  createDiecutterUpdate(event) {
+    var diecutter=  JSON.stringify({ id: this.state.id, FactoryId: this.state.FactoryId, cadfile: this.state.cadfile})
     
     const requestOptions = {
-        method: 'POST',
+        method: 'PUT',
         headers: {'key': sessionStorage.getItem('token'), 'Content-Type': 'application/json'},
-        body: customer
+        body: diecutter
         
       };
       console.log(requestOptions)
-      fetch('https://foiadev.diag.uniroma1.it:5002/v1/diecutters', requestOptions)
+      fetch('https://localhost:5002/v1/diecutters/'+this.props.diecutterId, requestOptions)
           .then(response => {
             console.log(response.json())
             if (response.status == 200) {
@@ -142,20 +144,21 @@ class Creatediecutter extends React.Component {
     
     
     var customerList=[];
-    customerList.push(<div><b>Creation Factory</b></div>)
-    customerList.push(<form onSubmit={this.createCustomerPost}>
+    customerList.push(<div><b>Update DieCutter</b></div>)
+    customerList.push(<form onSubmit={this.createDiecutterUpdate}>
         <label>
           id:    
-          <input type="text" name="id" onChange={this.handleChange} />
+          <input type="text" name="id" value={this.state.id} onChange={this.handleChange} />
         </label> <br />
         <label>
           FactoryId:
-          <input type="text" name="FactoryId" onChange={this.handleChange}/>
+          <input type="text" name="FactoryId" value={this.state.FactoryId} onChange={this.handleChange}/>
         </label> <br />
         <label>
           cad_file:
-          <input type="file" name="cadfile" onChange={this.handleChange}/>
+          <input type="file" name="cadfile" value={null} onChange={this.handleChange}/>
         </label> <br />
+       
         <input type="submit" value="Submit" />
       </form>)
     return customerList

@@ -34,7 +34,7 @@ class Diecutterlistall extends React.Component {
       this.setState({diecutterprop: this.props.diecutter})
      
       const headers = { 'key': sessionStorage.getItem('token') };
-      fetch("https://foiadev.diag.uniroma1.it:5002/v1/diecutters", { headers })
+      fetch("https://localhost:5002/v1/diecutters", { headers })
                 .then(res => 
                   {
                     if (res.status==401) {
@@ -63,7 +63,7 @@ class Diecutterlistall extends React.Component {
                   console.log("DIE CUTTER PERVENUTA");
                   console.log(sessionStorage.getItem('token'));
                   
-                  console.log("https://foiadev.diag.uniroma1.it:5002/v1/"+ this.state.factory+"/diecutters");
+                  console.log("https://localhost:5002/v1/"+ this.state.factory+"/diecutters");
                   
 
                 },
@@ -87,7 +87,7 @@ class Diecutterlistall extends React.Component {
       
       
       const headers = { 'key': sessionStorage.getItem('token') };
-      fetch("https://foiadev.diag.uniroma1.it:5002/v1/diecutters", { headers })
+      fetch("https://localhost:5002/v1/diecutters", { headers })
                 .then(res => 
                   {
                     if (res.status==401) {

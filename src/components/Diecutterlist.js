@@ -11,19 +11,22 @@ import {diecutters} from '../fakedata/data';
 import {factories} from '../fakedata/data';
 import Warninglist from './Warninglist';
 import {refreshToken} from '../utils/refreshToken';
+import { Pagination } from 'react-bootstrap';
+const numberOfelement=5;
 
 class Diecutterlist extends React.Component {
   constructor(props) {
     super(props);
     this.state = {value: '',
                   value2: factories[0],
-                  cutterselected: '',
+                  diecutterselected: '', diecutterpageselected:1,
                   customerselected: '',
                   render: '', username: '', keyA: '', factory:'', items: [], isLoaded: false,
                 diecuttersfiltered:[]};
 
     this.changeCutter = this.changeCutter.bind(this);
     this.handleChange = this.handleChange.bind(this);
+    this.handlePagChange=this.handlePagChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.filterDiecutters = this.filterDiecutters.bind(this);
   }
@@ -35,7 +38,7 @@ class Diecutterlist extends React.Component {
       this.setState({customerselected: this.props.customer})
      
       const headers = { 'key': sessionStorage.getItem('token') };
-      fetch("https://foiadev.diag.uniroma1.it:5002/v1/factories/"+ this.props.factory+"/diecutters", { headers })
+      fetch("https://localhost:5002/v1/factories/"+ this.props.factory+"/diecutters", { headers })
                 .then(res => 
                   {
                     if (res.status==401) {
@@ -60,13 +63,13 @@ class Diecutterlist extends React.Component {
                     isLoaded: true,
                     items: result
                   });
-                  this.setState({diecuttersfiltered: this.state.items})
+                  this.setState({diecuttersfiltered: result})
 
                   //alert('A name was submitted: ' + this.state.items);
                   console.log("DIE CUTTER PERVENUTA");
                   console.log(sessionStorage.getItem('token'));
                   
-                  console.log("https://foiadev.diag.uniroma1.it:5002/v1/"+ this.state.factory+"/diecutters");
+                  console.log("https://localhost:5002/v1/"+ this.state.factory+"/diecutters");
                   
 
                 },
@@ -93,7 +96,7 @@ class Diecutterlist extends React.Component {
       this.setState({factory: this.props.factory});
       
       const headers = { 'key': sessionStorage.getItem('token') };
-      fetch("https://foiadev.diag.uniroma1.it:5002/v1/factories/"+ this.props.factory+"/diecutters", { headers })
+      fetch("https://localhost:5002/v1/factories/"+ this.props.factory+"/diecutters", { headers })
                 .then(res => 
                   {
                     if (res.status==401) {
@@ -158,8 +161,18 @@ class Diecutterlist extends React.Component {
     var i;
     dieCuttersList.push(<Col><p><input type="text" onChange={this.filterDiecutters} />   Search Diecutters   </p></Col>)
 
-    for (i=0 ; i<this.state.diecuttersfiltered.length; i++) {
-      if (this.state.cutterselected==this.state.diecuttersfiltered[i].id) {
+    var firsttoshow = (this.state.diecutterpageselected-1)*numberOfelement
+    var maxindex
+    if (firsttoshow+numberOfelement>this.state.diecuttersfiltered.length) {
+      maxindex=this.state.diecuttersfiltered.length;
+    }
+    else {
+      maxindex=firsttoshow+numberOfelement;
+    }
+    for (i=firsttoshow ; i<maxindex; i++) {
+      console.log(i)
+      console.log(this.state.diecuttersfiltered)
+      if (this.state.diecutterselected==this.state.diecuttersfiltered[i].id) {
         dieCuttersList.push(<p><Button variant="dark"  value={this.state.diecuttersfiltered[i].id} onClick={this.changeCutter} >DieCutter {this.state.diecuttersfiltered[i].id}  </Button></p>);
 
       }
@@ -173,8 +186,8 @@ class Diecutterlist extends React.Component {
   }
 
   changeCutter(event){
-    this.setState({cutterselected: event.target.value});
-    //console.log(this.state.cutterselected);
+    this.setState({diecutterselected: event.target.value});
+    //console.log(this.state.diecutterselected);
   }
 
 
@@ -210,14 +223,86 @@ class Diecutterlist extends React.Component {
     return dieCutterWarnings;
   }
 
+  handlePagChange(event) {
+
+    if (event.target.type.includes("diecutter") ) {
+      console.log(this.state.diecutterpageselected)
+      if (event.target.type == "prevdiecutter") {
+        if (this.state.diecutterpageselected != 1) {
+          
+          this.setState({diecutterpageselected: this.state.diecutterpageselected-1})
+        }
+        
+      }
+      else if (event.target.type == "nextdiecutter") {
+      
+        if (this.state.diecutterpageselected != Math.ceil((this.state.diecuttersfiltered.length)/numberOfelement)) {
+          
+          this.setState({diecutterpageselected: this.state.diecutterpageselected+1})
+        }
+      }
+      else {
+        
+        this.setState({diecutterpageselected: parseInt(event.target.text)})
+      }
+      
+    }
+    
+
+    
+    
+  }
+
+  paginationInit(length, pageselected, element) {
+    let active = 2;
+    let items = [];
+    length=Math.ceil(length)
+    
+    if (length <= 1) {
+      return items
+    }
+    items.push(<Pagination.Item type={"prev"+element.toString()}  onClick={this.handlePagChange}>{"<"}</Pagination.Item>)
+
+    
+    for (let number = 1; number <= length; number++) {
+      
+      if (number==pageselected) {
+        
+        items.push(
+          <Pagination.Item active>
+            {number}
+          </Pagination.Item>,
+        );
+      }
+      else {
+        items.push(
+          <Pagination.Item type={element} onClick={this.handlePagChange}>
+            {number}
+          </Pagination.Item>,
+        );
+      }
+      
+    }
+    items.push(<Pagination.Item type={"next"+element.toString()}  onClick={this.handlePagChange}>{">"}</Pagination.Item>)
+
+    return items
+    //this.setState({pagesdiecutter: items})
+  }
+
+
   render() {
     console.log("STO RENDERIZZANDOOO");
-    var cuttersel=this.state.cutterselected;
-    console.log(this.state.cutterselected);
+    var cuttersel=this.state.diecutterselected;
+    console.log(this.state.diecutterselected);
     return (
       <Container fluid>
         <Row>
-          <Col style={{backgroundColor: '#B8860B',  border:'2px solid black'}}>{this.displayDieCutters()} </Col>
+          <Col style={{backgroundColor: '#B8860B',  border:'2px solid black'}}>{this.displayDieCutters()} 
+          <Pagination size="sm">
+            {this.paginationInit((this.state.diecuttersfiltered.length)/numberOfelement, this.state.diecutterpageselected, "diecutter")}
+            </Pagination>
+          </Col>
+          
           <Col xs={6} style={{backgroundColor: '#BDB76B',  border:'2px solid black'}}><Diecutterinfo dataParentToChild={[cuttersel,1]} username={this.state.username} keyA={this.state.keyA}/></Col>
           <Col style={{backgroundColor: '#B8860B',  border:'2px solid black'}}> <Warninglist username={this.state.username} keyA={this.state.keyA} factory={this.state.factory}/></Col>
         </Row>

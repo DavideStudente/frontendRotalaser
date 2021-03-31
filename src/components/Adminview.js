@@ -20,15 +20,18 @@ import { withRouter } from 'react-router';
 import { faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 import { faPen } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Pagination } from 'react-bootstrap';
+import PageItem from 'react-bootstrap/PageItem'
+import ReactPaginate from 'react-paginate';
 
 
-
+const numberOfelement=5;
 
 class Adminview extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {value: '', username: '', isLoaded: false, items: [],
-     diecutterselected:'', customerselected: '', keyA: '', refresh: 0, role: '', diecutters: [],
+    this.state = {value: '', username: '', isLoaded: false, items: [], nmbrpages: 0, pagesdiecutter: [], customerpageselected:1,
+     diecutterpageselected:1, diecutterselected:'', customerselected: '', keyA: '', refresh: 0, role: '', diecutters: [],
     customersfiltered:[], diecuttersfiltered:[], reload: false};
 
     this.changeCustomer = this.changeCustomer.bind(this);
@@ -38,10 +41,12 @@ class Adminview extends React.Component {
     this.redirectCreationCustomer=this.redirectCreationCustomer.bind(this);
     this.redirectCreationDieCutter=this.redirectCreationDieCutter.bind(this);
     this.redirectUpdateCustomer=this.redirectUpdateCustomer.bind(this);
+    this.redirectUpdateDiecutter=this.redirectUpdateDiecutter.bind(this);
     this.filterCustomers=this.filterCustomers.bind(this);
     this.deleteDiecutter=this.deleteDiecutter.bind(this);
     this.deleteCustomer=this.deleteCustomer.bind(this);
     this.filterDiecutters=this.filterDiecutters.bind(this);
+    this.handlePagChange=this.handlePagChange.bind(this);
 
   }
 
@@ -50,118 +55,33 @@ class Adminview extends React.Component {
     this.setState({username: this.props.match.params.handle});
     this.setState({keyA: sessionStorage.getItem('token')});
     this.setState({role: sessionStorage.getItem('role')});
-     
+    this.getRequests() 
 
-    //const headers = {'key': this.props.location.state };
-    const headers = {'key': sessionStorage.getItem('token') };
-    if (sessionStorage.getItem('role') == "admin") {
-      fetch("https://foiadev.diag.uniroma1.it:5002/v1/customers", { headers })
-                .then(res => 
-                  {
-                    if (res.status==401) {
-                      //console.log("token vecchio e scaduto!" + sessionStorage.getItem('token'));
-                      const newTok=refreshToken(sessionStorage.getItem('refreshToken'));
-                      //sessionStorage.setItem('token', newTok )
-                      //console.log("token nuovo e bellissimo!" + newTok);
-                      //console.log("token nuovo e bellissimo!" + sessionStorage.getItem('token'));
-                      this.setState({keyA: newTok})
-                      return "false";
-                      
-                    }
-                    else {
-                      return res.json()
-                    }
-                  })
-                .then(
-                  (result) => {
-                    if (result == "false") return;
-                    //console.log(result);
-                    this.setState({
-                      isLoaded: true,
-                      items: result
-                    });
-                    this.setState({customersfiltered: this.state.items});   
-                    console.log("QUESTI SONO I CUSTOMERS")
-                    console.log(result)
-                    
-
-                  },
-                  // Note: it's important to handle errors here
-                  // instead of a catch() block so that we don't swallow
-                  // exceptions from actual bugs in components.
-                  (error) => {
-                    console.log("ERRORE!" + error);
-                  }
-                ).then( risultato => {
-
-
-                fetch("https://foiadev.diag.uniroma1.it:5002/v1/diecutters", { headers })
-                .then(res => 
-                  {
-                    if (res.status==401) {
-                      //console.log("token vecchio e scaduto!" + sessionStorage.getItem('token'));
-                      const newTok=refreshToken(sessionStorage.getItem('refreshToken'));
-                      //sessionStorage.setItem('token', newTok )
-                      //console.log("token nuovo e bellissimo!" + newTok);
-                      //console.log("token nuovo e bellissimo!" + sessionStorage.getItem('token'));
-                      this.setState({keyA: newTok})
-                      return "false";
-                      
-                    }
-                    else {
-                      return res.json()
-                    }
-                  })
-                .then(
-                  (result) => {
-                    if (result == "false") return;
-                    //console.log(result);
-                    this.setState({
-                
-                      diecutters: result
-                    });
-                    this.setState({diecuttersfiltered: result})
-                    console.log("QUESTI SONO LE DIECUTTERS ")
-                    console.log(result)
-                    
-
-                  },
-                  // Note: it's important to handle errors here
-                  // instead of a catch() block so that we don't swallow
-                  // exceptions from actual bugs in components.
-                  (error) => {
-                    console.log("ERRORE!" + error);
-                  }
-                )
-                }
-                )
-    }
-    
      
   }
 
   componentDidUpdate () {
     if (this.state.keyA!=sessionStorage.getItem('token') || this.state.reload==true) {
       this.setState({reload:false})
-      console.log("STO RICARICANDO I COSI A SEGUITO DI UN ELIMINAZIONE!")
-      //console.log("SONO NELL'UPDATE!" + sessionStorage.getItem('token'))
+      
       this.setState({refresh: 0});
       var usern=this.props.match.params.handle;
       this.setState({username: this.props.match.params.handle});
       this.setState({keyA: sessionStorage.getItem('token')});
-      
+      this.getRequests();
       //const headers = {'key': this.props.location.state };
-      const headers = {'key': sessionStorage.getItem('token') };
+    }
+  }
+
+  getRequests(){
+    const headers = {'key': sessionStorage.getItem('token') };
       if (sessionStorage.getItem('role') == "admin") {
-        fetch("https://foiadev.diag.uniroma1.it:5002/v1/customers", { headers })
+        fetch("https://localhost:5002/v1/customers", { headers })
                 .then(res => 
                   {
                     if (res.status==401) {
-                      //console.log("token vecchio e scaduto!" + sessionStorage.getItem('token'));
                       const newTok=refreshToken(sessionStorage.getItem('refreshToken'));
-                      //sessionStorage.setItem('token', newTok )
-                      //console.log("token nuovo e bellissimo!" + newTok);
-                      //console.log("token nuovo e bellissimo!" + sessionStorage.getItem('token'));
+                      
                       this.setState({keyA: newTok})
                       return "false";
                       
@@ -173,14 +93,12 @@ class Adminview extends React.Component {
                 .then(
                   (result) => {
                     if (result == "false") return;
-                    //console.log(result);
                     this.setState({
                       isLoaded: true,
                       items: result
                     });
                     this.setState({customersfiltered: result})
-                    console.log("QUESTI SONO I CUSTOMERS")
-                    console.log(result)
+              
                     
 
                   },
@@ -193,15 +111,13 @@ class Adminview extends React.Component {
                 ).then( risultato => {
 
 
-                  fetch("https://foiadev.diag.uniroma1.it:5002/v1/diecutters", { headers })
+                  fetch("https://localhost:5002/v1/diecutters", { headers })
                   .then(res => 
                     {
                       if (res.status==401) {
-                        //console.log("token vecchio e scaduto!" + sessionStorage.getItem('token'));
+                       
                         const newTok=refreshToken(sessionStorage.getItem('refreshToken'));
-                        //sessionStorage.setItem('token', newTok )
-                        //console.log("token nuovo e bellissimo!" + newTok);
-                        //console.log("token nuovo e bellissimo!" + sessionStorage.getItem('token'));
+                        
                         this.setState({keyA: newTok})
                         return "false";
                         
@@ -213,15 +129,14 @@ class Adminview extends React.Component {
                   .then(
                     (result) => {
                       if (result == "false") return;
-                      //console.log(result);
+              
                       this.setState({
                   
                         diecutters: result
                       });
                       this.setState({diecuttersfiltered: result})
+                      
 
-                      console.log("QUESTI SONO LE DIECUTTERS ")
-                      console.log(result)
                       
   
                     },
@@ -236,20 +151,18 @@ class Adminview extends React.Component {
                   )
       }
       
-    }
-     
   }
 
   changeCustomer(event){
     this.setState({customerselected: event.target.value});
     this.setState({diecutterselected: ''});
-    console.log("CHANGED CUSTOMER!");
+ 
   }
 
   changeDiecutter(event){
     this.setState({diecutterselected: event.target.value});
     this.setState({customerselected: ''});
-    console.log("CHANGED DieCutter!");
+  
   }
   deleteDiecutter(){
     
@@ -258,8 +171,8 @@ class Adminview extends React.Component {
         headers: {'key': sessionStorage.getItem('token')},
         
       };
-      console.log(requestOptions)
-      fetch('https://foiadev.diag.uniroma1.it:5002/v1/diecutters/'+this.state.diecutterselected, requestOptions)
+    
+      fetch('https://localhost:5002/v1/diecutters/'+this.state.diecutterselected, requestOptions)
           .then(response => {
            
             this.setState({diecutterselected: ''})
@@ -282,8 +195,8 @@ class Adminview extends React.Component {
         headers: {'key': sessionStorage.getItem('token')},
         
       };
-      console.log(requestOptions)
-      fetch('https://foiadev.diag.uniroma1.it:5002/v1/customers/'+this.state.customerselected, requestOptions)
+     
+      fetch('https://localhost:5002/v1/customers/'+this.state.customerselected, requestOptions)
           .then(response => {
            
             this.setState({customerselected: ''})
@@ -310,6 +223,10 @@ class Adminview extends React.Component {
       else {
         
         factoriesList.push(<Row><Col><b>YOU ARE IN THE OVERVIEW OF THE DIECUTTER WITH ID: {this.state.diecutterselected}</b></Col>
+        <Col xs={1}><button onClick={this.redirectUpdateDiecutter} ><FontAwesomeIcon
+          icon={faPen} 
+          
+        /></button></Col>
         <Col xs={1}><button onClick={this.deleteDiecutter}><FontAwesomeIcon
           icon={faTrashAlt}
           
@@ -355,14 +272,20 @@ class Adminview extends React.Component {
     this.props.history.push({pathname:'/create', state: {element: "diecutter"}});
   }
 
+  redirectUpdateDiecutter() {
+    this.props.history.push({pathname:'/update', state: {element: "diecutter", diecutterId: this.state.diecutterselected}});
+  }
+  
   filterCustomers(event) {
+    
     var i;
     if (event.target.value=='') {
       this.setState({customersfiltered: this.state.items})
     }
     var customersfiltered = []
-   
+    
     for (i=0; i<this.state.items.length; i++) {
+      
       if ((this.state.items[i].piva).includes(event.target.value)) {
         
         customersfiltered.push(this.state.items[i])
@@ -371,14 +294,108 @@ class Adminview extends React.Component {
       }
     }
     this.setState({customersfiltered: customersfiltered})
+    
   }
 
+  handlePagChange(event) {
+    
+    
+    if (event.target.type.includes("customer")) {
+      if (event.target.type == "prevcustomer") {
+        if (this.state.customerpageselected != 1) {
+          this.setState({customerpageselected: this.state.customerpageselected-1})
+        }
+        
+      }
+      else if (event.target.type == "nextcustomer") {
+      
+        if (this.state.customerpageselected != Math.ceil((this.state.customersfiltered.length)/numberOfelement)) {
+          this.setState({customerpageselected: this.state.customerpageselected+1})
+        }
+      }
+      else {
+        this.setState({customerpageselected: parseInt(event.target.text)})
+      }
+    }
+
+
+    
+
+    else if (event.target.type.includes("diecutter") ) {
+      if (event.target.type == "prevdiecutter") {
+        if (this.state.diecutterpageselected != 1) {
+          this.setState({diecutterpageselected: this.state.diecutterpageselected-1})
+        }
+        
+      }
+      else if (event.target.type == "nextdiecutter") {
+      
+        if (this.state.diecutterpageselected != Math.ceil((this.state.diecuttersfiltered.length)/numberOfelement)) {
+          this.setState({diecutterpageselected: this.state.diecutterpageselected+1})
+        }
+      }
+      else {
+        this.setState({diecutterpageselected: parseInt(event.target.text)})
+      }
+      
+    }
+    
+
+    
+    
+  }
+
+  paginationInit(length, pageselected, element) {
+    let active = 2;
+    let items = [];
+    length=Math.ceil(length)
+    if (length <= 1) {
+      return items
+    }
+    items.push(<Pagination.Item type={"prev"+element.toString()}  onClick={this.handlePagChange}>{"<"}</Pagination.Item>)
+
+    
+    for (let number = 1; number <= length; number++) {
+      
+      if (number==pageselected) {
+        
+        items.push(
+          <Pagination.Item active>
+            {number}
+          </Pagination.Item>,
+        );
+      }
+      else {
+        items.push(
+          <Pagination.Item type={element} onClick={this.handlePagChange}>
+            {number}
+          </Pagination.Item>,
+        );
+      }
+      
+    }
+    items.push(<Pagination.Item type={"next"+element.toString()}  onClick={this.handlePagChange}>{">"}</Pagination.Item>)
+
+    return items
+    //this.setState({pagesdiecutter: items})
+  }
+
+
   displayCustomers() {
+    
     var customersList=[];
       var i;
       customersList.push(<Col><p><input type="text" onChange={this.filterCustomers} />   Search Customers   </p></Col>)
       customersList.push(<Col><p><Button variant="primary" onClick={this.redirectCreationCustomer} > Add Customer</Button></p></Col>)
-      for (i=0 ; i<this.state.customersfiltered.length; i++) {
+      var firsttoshow = (this.state.customerpageselected-1)*numberOfelement
+      var maxindex
+      if (firsttoshow+numberOfelement>this.state.customersfiltered.length) {
+        maxindex=this.state.customersfiltered.length;
+      }
+      else {
+        maxindex=firsttoshow+numberOfelement;
+      }
+      for (i=firsttoshow ; i<maxindex; i++) {
         
         if (this.state.customerselected==this.state.customersfiltered[i].piva) {
           customersList.push(<Col><p><Button variant="dark" value={this.state.customersfiltered[i].piva} onClick={this.changeCustomer} > Customer {this.state.customersfiltered[i].piva}</Button></p></Col>);
@@ -421,7 +438,16 @@ class Adminview extends React.Component {
 
       diecuttersList.push(<Col><p><Button variant="primary" onClick={this.redirectCreationDieCutter} > Add DieCutter</Button>
       </p></Col>)
-      for (i=0 ; i<this.state.diecuttersfiltered.length; i++) {
+      var firsttoshow = (this.state.diecutterpageselected-1)*5
+      //this.paginationInit(this.state.customersfiltered.length/5);
+      var maxindex
+      if (firsttoshow+numberOfelement>this.state.diecuttersfiltered.length) {
+        maxindex=this.state.diecuttersfiltered.length;
+      }
+      else {
+        maxindex=firsttoshow+numberOfelement;
+      }
+      for (i=firsttoshow ; i<maxindex; i++) {
         if (this.state.diecutterselected==this.state.diecuttersfiltered[i].id) {
           diecuttersList.push(<Col><p><Button variant="dark" value={this.state.diecuttersfiltered[i].id} onClick={this.changeDiecutter} > DieCutter {this.state.diecuttersfiltered[i].id}</Button></p></Col>);
 
@@ -450,14 +476,20 @@ class Adminview extends React.Component {
   
 
   render() {
-    console.log("STO RENDERIZZANDOOO");
     var cuttersel=this.state.cutterselected;
-    console.log(this.state.cutterselected);
     return (
       <Container fluid>
         <Row>
-          <Col style={{backgroundColor: '#B8860B',  border:'2px solid black'}}>{this.displayCustomers()} </Col>
-          <Col style={{backgroundColor: '#B8860B',  border:'2px solid black'}}>{this.displayDiecutters()} </Col>
+          <Col style={{backgroundColor: '#B8860B',  border:'2px solid black'}}>{this.displayCustomers()} 
+            <Pagination size="sm">
+            {this.paginationInit((this.state.customersfiltered.length)/numberOfelement, this.state.customerpageselected, "customer")}
+            </Pagination>
+          </Col>
+          <Col style={{backgroundColor: '#B8860B',  border:'2px solid black'}}>{this.displayDiecutters()} 
+            <Pagination size="sm">
+            {this.paginationInit((this.state.diecuttersfiltered.length)/numberOfelement, this.state.diecutterpageselected, "diecutter")}
+            </Pagination> 
+          </Col>
         </Row>
         <Row>
           <Col style={{backgroundColor: '#B8860B',  border:'2px solid black'}}>{this.displayChoose()} </Col>  

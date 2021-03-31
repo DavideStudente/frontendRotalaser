@@ -31,7 +31,7 @@ class UpdateView extends React.Component {
     super(props);
     this.state = {value: '', objecttocreate:''};
 
-    this.displayCreation = this.displayCreation.bind(this);
+    this.displayUpdate = this.displayUpdate.bind(this);
   }
 
   componentDidMount() {
@@ -43,20 +43,19 @@ class UpdateView extends React.Component {
     
      
   
-  displayCreation() {
+  displayUpdate() {
     if (this.state.objecttocreate=="customer") {
         return (<Updatecustomer history={this.props.history} customerId={this.props.location.state.customerId}/>)
     }
     if (this.state.objecttocreate=="factory") {
-      
-      return (<Updatefactory customer={this.props.location.state.customerId} history={this.props.history} UserId={this.props.location.state.userId}/>)
+      return (<Updatefactory  history={this.props.history} factoryId={this.props.location.state.factoryId}/>)
     }
     if (this.state.objecttocreate=="diecutter") {
-      return (<Updatediecutter history={this.props.history} diecutter={this.props.diecutter}/>)
+      return (<Updatediecutter history={this.props.history} diecutterId={this.props.location.state.diecutterId}/>)
 
     }
     if (this.state.objecttocreate=="user"){
-      return (<Updateuser history={this.props.history} customer={this.props.location.state.customerId}/>)
+      return (<Updateuser history={this.props.history} customer={this.props.location.state.customerId} userId={this.props.location.state.userId}/>)
     }
   }
 
@@ -69,7 +68,7 @@ class UpdateView extends React.Component {
     console.log(this.state.cutterselected);
     return (
       <Container fluid>
-        {this.displayCreation()}
+        {this.displayUpdate()}
         
       </Container>
       

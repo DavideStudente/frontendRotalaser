@@ -14,13 +14,20 @@ import Diecutterlist from './Diecutterlist';
 import DiecutterlistAdmin from './DiecutterlistAdmin';
 import {refreshToken} from '../utils/refreshToken';
 import { faTrashAlt } from "@fortawesome/free-solid-svg-icons";
+import { faPen } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import  FactorylistUser  from './FactorylistUser';
+import { Pagination } from 'react-bootstrap';
+
+
+
+const numberOfelement=5;
 
 class FactorylistCustomer extends React.Component {
   constructor(props) {
     super(props);
     this.state = {value: '', username: '', isLoaded: false, items: [], factoryselected: '', keyA: '', refresh: 0, role: '',
+     userpageselected:1 , factorypageselected:1,
      customerselected: '', users: [], userselected: '', factoriesfiltered: [], usersfiltered:[], reload: false};
 
     this.changeFactory = this.changeFactory.bind(this);
@@ -29,10 +36,14 @@ class FactorylistCustomer extends React.Component {
     this.handleSubmit = this.handleSubmit.bind(this);
     this.redirectCreationFactory=this.redirectCreationFactory.bind(this);
     this.redirectCreationUser=this.redirectCreationUser.bind(this);
+    this.redirectUpdateFactory=this.redirectUpdateFactory.bind(this);
+    this.redirectUpdateUser=this.redirectUpdateUser.bind(this);
     this.filterFactories=this.filterFactories.bind(this);
     this.filterUsers=this.filterUsers.bind(this);
     this.deleteFactory=this.deleteFactory.bind(this);
     this.deleteUser = this.deleteUser.bind(this);
+    this.handlePagChange=this.handlePagChange.bind(this);
+
   }
 
   componentDidMount () {
@@ -44,9 +55,9 @@ class FactorylistCustomer extends React.Component {
     
     //const headers = {'key': this.props.location.state };
     const headers = {'key': sessionStorage.getItem('token') };
-    console.log("https://foiadev.diag.uniroma1.it:5002/v1/customers/"+this.props.customer+"/factories")
+    console.log("https://localhost:5002/v1/customers/"+this.props.customer+"/factories")
     
-      fetch("https://foiadev.diag.uniroma1.it:5002/v1/customers/"+this.props.customer+"/factories", { headers })
+      fetch("https://localhost:5002/v1/customers/"+this.props.customer+"/factories", { headers })
                 .then(res => 
                   {
                     if (res.status==401) {
@@ -82,7 +93,7 @@ class FactorylistCustomer extends React.Component {
                     console.log("ERRORE!" + error);
                   }
                 ).then(res => {
-                  fetch("https://foiadev.diag.uniroma1.it:5002/v1/customers/"+this.props.customer+"/users", { headers })
+                  fetch("https://localhost:5002/v1/customers/"+this.props.customer+"/users", { headers })
                 .then(res => 
                   {
                     if (res.status==401) {
@@ -145,7 +156,7 @@ class FactorylistCustomer extends React.Component {
       //const headers = {'key': this.props.location.state };
       const headers = {'key': sessionStorage.getItem('token') };
       
-        fetch("https://foiadev.diag.uniroma1.it:5002/v1/customers/"+this.props.customer+"/factories", { headers })
+        fetch("https://localhost:5002/v1/customers/"+this.props.customer+"/factories", { headers })
                   .then(res => 
                     {
                       if (res.status==401) {
@@ -181,7 +192,7 @@ class FactorylistCustomer extends React.Component {
                       console.log("ERRORE!" + error);
                     }
                   ).then(res => {
-                    fetch("https://foiadev.diag.uniroma1.it:5002/v1/customers/"+this.props.customer+"/users", { headers })
+                    fetch("https://localhost:5002/v1/customers/"+this.props.customer+"/users", { headers })
                   .then(res => 
                     {
                       if (res.status==401) {
@@ -236,7 +247,7 @@ class FactorylistCustomer extends React.Component {
   changeUser(event){
     this.setState({userselected: event.target.value});
     this.setState({factoryselected: ''});
-    //console.log(this.state.factoryselected);
+    console.log(this.state.userselected);
   }
 
 
@@ -246,6 +257,14 @@ class FactorylistCustomer extends React.Component {
 
   redirectCreationUser() {
     this.props.history.push({pathname:'/create', state: {element: "user", customerId: this.state.customerselected}});
+  }
+
+  redirectUpdateFactory() {
+    this.props.history.push({pathname:'/update', state: {element: "factory", customerId: this.state.customerselected, factoryId: this.state.factoryselected}});
+  }
+
+  redirectUpdateUser() {
+    this.props.history.push({pathname:'/update', state: {element: "user", customerId: this.state.customerselected, userId: this.state.userselected}});
   }
 
   filterFactories(event) {
@@ -274,7 +293,15 @@ class FactorylistCustomer extends React.Component {
 
       factoriesList.push(<Col><p><Button variant="primary" onClick={this.redirectCreationFactory} > AddFactoryToCustomer</Button></p></Col>)
 
-      for (i=0 ; i<this.state.factoriesfiltered.length; i++) {
+      var firsttoshow = (this.state.factorypageselected-1)*numberOfelement
+      var maxindex
+      if (firsttoshow+numberOfelement>this.state.factoriesfiltered.length) {
+        maxindex=this.state.factoriesfiltered.length;
+      }
+      else {
+        maxindex=firsttoshow+numberOfelement;
+      }
+      for (i=firsttoshow ; i<maxindex; i++) {
         if (this.state.factoryselected == this.state.factoriesfiltered[i].id) {
           factoriesList.push(<Col><p><Button variant="dark" value={this.state.factoriesfiltered[i].id} onClick={this.changeFactory} > Factory {this.state.factoriesfiltered[i].id}</Button></p></Col>);
 
@@ -297,7 +324,7 @@ class FactorylistCustomer extends React.Component {
         
       };
       console.log(requestOptions)
-      fetch('https://foiadev.diag.uniroma1.it:5002/v1/factories/'+this.state.factoryselected, requestOptions)
+      fetch('https://localhost:5002/v1/factories/'+this.state.factoryselected, requestOptions)
           .then(response => {
            
             this.setState({factoryselected: ''})
@@ -321,7 +348,7 @@ class FactorylistCustomer extends React.Component {
         
       };
       console.log(requestOptions)
-      fetch('https://foiadev.diag.uniroma1.it:5002/v1/users/'+this.state.userselected, requestOptions)
+      fetch('https://localhost:5002/v1/users/'+this.state.userselected, requestOptions)
           .then(response => {
            
             this.setState({userselected: ''})
@@ -348,6 +375,10 @@ class FactorylistCustomer extends React.Component {
         
         var factorysel=this.state.factoryselected;
         factoriesList.push(<Row><Col><b>YOU ARE IN THE OVERVIEW OF THE FACTORY WITH ID: {this.state.factoryselected}</b></Col>
+          <Col xs={1}><button onClick={this.redirectUpdateFactory} ><FontAwesomeIcon
+          icon={faPen} 
+          
+          /></button></Col>
           <Col xs={1}><button onClick={this.deleteFactory}><FontAwesomeIcon
             icon={faTrashAlt}
             
@@ -363,12 +394,19 @@ class FactorylistCustomer extends React.Component {
     else {
       
       factoriesList.push(<Row><Col><b>YOU ARE IN THE OVERVIEW OF THE USER WITH USERNAME: {this.state.userselected}</b></Col>
+
+        <Col xs={1}><button onClick={this.redirectUpdateUser} ><FontAwesomeIcon
+          icon={faPen} 
+          
+          /></button></Col>
         <Col xs={1}><button onClick={this.deleteUser}><FontAwesomeIcon
           icon={faTrashAlt}
           
         /></button></Col>
         </Row>);
       //TODO list the factories of the users
+      console.log("USER SELEZIONATO")
+      console.log(this.state.userselected)
       factoriesList.push(<div><FactorylistUser user={this.state.userselected} customer={this.state.customerselected} username={this.state.username} keyA={this.state.keyA} history={this.props.history}/></div>)
 
       return factoriesList;
@@ -402,7 +440,15 @@ class FactorylistCustomer extends React.Component {
 
     usersList.push(<Col><p><Button variant="primary" onClick={this.redirectCreationUser} > AddUserToCustomer</Button></p></Col>)
 
-    for (i=0 ; i<this.state.usersfiltered.length; i++) {
+    var firsttoshow = (this.state.userpageselected-1)*numberOfelement
+    var maxindex
+    if (firsttoshow+numberOfelement>this.state.usersfiltered.length) {
+      maxindex=this.state.usersfiltered.length;
+    }
+    else {
+      maxindex=firsttoshow+numberOfelement;
+    }
+    for (i=firsttoshow ; i<maxindex; i++) {
       if (this.state.userselected==this.state.usersfiltered[i].id) {
         usersList.push(<Col><p><Button variant="dark" value={this.state.usersfiltered[i].id} onClick={this.changeUser} > User {this.state.usersfiltered[i].id}</Button></p></Col>);
 
@@ -418,6 +464,93 @@ class FactorylistCustomer extends React.Component {
   }
 
 
+  handlePagChange(event) {
+    
+    
+    if (event.target.type.includes("user")) {
+      if (event.target.type == "prevuser") {
+        if (this.state.userpageselected != 1) {
+          this.setState({userpageselected: this.state.userpageselected-1})
+        }
+        
+      }
+      else if (event.target.type == "nextuser") {
+      
+        if (this.state.userpageselected != Math.ceil((this.state.usersfiltered.length)/numberOfelement)) {
+          this.setState({userpageselected: this.state.userpageselected+1})
+        }
+      }
+      else {
+        this.setState({userpageselected: parseInt(event.target.text)})
+      }
+    }
+
+
+    
+
+    else if (event.target.type.includes("factory") ) {
+      console.log(this.state.factorypageselected)
+      if (event.target.type == "prevfactory") {
+        if (this.state.factorypageselected != 1) {
+          
+          this.setState({factorypageselected: this.state.factorypageselected-1})
+        }
+        
+      }
+      else if (event.target.type == "nextfactory") {
+      
+        if (this.state.factorypageselected != Math.ceil((this.state.factoriesfiltered.length)/numberOfelement)) {
+          
+          this.setState({factorypageselected: this.state.factorypageselected+1})
+        }
+      }
+      else {
+        
+        this.setState({factorypageselected: parseInt(event.target.text)})
+      }
+      
+    }
+    
+
+    
+    
+  }
+
+  paginationInit(length, pageselected, element) {
+    let active = 2;
+    let items = [];
+    length=Math.ceil(length)
+    
+    if (length <= 1) {
+      return items
+    }
+    items.push(<Pagination.Item type={"prev"+element.toString()}  onClick={this.handlePagChange}>{"<"}</Pagination.Item>)
+
+    
+    for (let number = 1; number <= length; number++) {
+      
+      if (number==pageselected) {
+        
+        items.push(
+          <Pagination.Item active>
+            {number}
+          </Pagination.Item>,
+        );
+      }
+      else {
+        items.push(
+          <Pagination.Item type={element} onClick={this.handlePagChange}>
+            {number}
+          </Pagination.Item>,
+        );
+      }
+      
+    }
+    items.push(<Pagination.Item type={"next"+element.toString()}  onClick={this.handlePagChange}>{">"}</Pagination.Item>)
+
+    return items
+    //this.setState({pagesdiecutter: items})
+  }
 
   handleChange(event) {
     this.setState({value: event.target.value});
@@ -431,14 +564,21 @@ class FactorylistCustomer extends React.Component {
   
 
   render() {
-    console.log("STO RENDERIZZANDOOO");
     var cuttersel=this.state.cutterselected;
     console.log(this.state.cutterselected);
     return (
       <Container fluid>
         <Row>
-          <Col style={{backgroundColor: '#B8860B',  border:'2px solid black'}}>{this.displayFactories()} </Col>
-          <Col style={{backgroundColor: '#B8860B',  border:'2px solid black'}}>{this.displayUsers()} </Col>
+          <Col style={{backgroundColor: '#B8860B',  border:'2px solid black'}}>{this.displayFactories()} 
+            <Pagination size="sm">
+            {this.paginationInit((this.state.factoriesfiltered.length)/numberOfelement, this.state.factorypageselected, "factory")}
+            </Pagination>
+          </Col>
+          <Col style={{backgroundColor: '#B8860B',  border:'2px solid black'}}>{this.displayUsers()}
+          <Pagination size="sm">
+            {this.paginationInit((this.state.usersfiltered.length)/numberOfelement, this.state.userpageselected, "user")}
+            </Pagination>
+           </Col>
     
         </Row>
         <Row>
