@@ -40,8 +40,8 @@ class Createcustomer extends React.Component {
    //const headers = {'key': this.props.location.state };
    const headers = {'key': sessionStorage.getItem('token') };
    if (sessionStorage.getItem('role') == "admin") {
-     console.log("https://localhost:5002/v1/factories/"+this.props.factoryId)
-     fetch("https://localhost:5002/v1/factories/"+this.props.factoryId, { headers })
+     console.log("https://foiadev.diag.uniroma1.it:5002/v1/factories/"+this.props.factoryId)
+     fetch("https://foiadev.diag.uniroma1.it:5002/v1/factories/"+this.props.factoryId, { headers })
                .then(res => 
                  {
                    if (res.status==401) {
@@ -109,7 +109,7 @@ class Createcustomer extends React.Component {
         
       };
       console.log(requestOptions)
-      fetch('https://localhost:5002/v1/factories/'+this.props.factoryId, requestOptions)
+      fetch('https://foiadev.diag.uniroma1.it:5002/v1/factories/'+this.props.factoryId, requestOptions)
           .then(response => {
             console.log(response.json())
             if (response.status == 200) {

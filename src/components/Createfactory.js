@@ -63,7 +63,7 @@ class Createcustomer extends React.Component {
         
       };
       console.log(requestOptions)
-      fetch('https://localhost:5002/v1/factories', requestOptions)
+      fetch('https://foiadev.diag.uniroma1.it:5002/v1/factories', requestOptions)
           .then(response => {
             console.log(response.json())
             if (response.status == 200) {

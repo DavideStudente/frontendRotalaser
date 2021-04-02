@@ -36,8 +36,8 @@ class Createcustomer extends React.Component {
     this.setState({CustomerPiva: this.props.customer})
     const headers = {'key': sessionStorage.getItem('token') };
    if (sessionStorage.getItem('role') == "admin") {
-     console.log("https://localhost:5002/v1/users/"+this.props.userId)
-     fetch("https://localhost:5002/v1/users/"+this.props.userId, { headers })
+     console.log("https://foiadev.diag.uniroma1.it:5002/v1/users/"+this.props.userId)
+     fetch("https://foiadev.diag.uniroma1.it:5002/v1/users/"+this.props.userId, { headers })
                .then(res => 
                  {
                    if (res.status==401) {
@@ -106,7 +106,7 @@ class Createcustomer extends React.Component {
         
       };
       console.log(requestOptions)
-      fetch('https://localhost:5002/v1/users/'+this.props.userId, requestOptions)
+      fetch('https://foiadev.diag.uniroma1.it:5002/v1/users/'+this.props.userId, requestOptions)
           .then(response => {
             console.log(response.json())
             if (response.status == 200) {

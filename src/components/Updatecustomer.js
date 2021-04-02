@@ -39,7 +39,7 @@ class Updatecustomer extends React.Component {
     //const headers = {'key': this.props.location.state };
     const headers = {'key': sessionStorage.getItem('token') };
     if (sessionStorage.getItem('role') == "admin") {
-      fetch("https://localhost:5002/v1/customers/"+this.props.customerId, { headers })
+      fetch("https://foiadev.diag.uniroma1.it:5002/v1/customers/"+this.props.customerId, { headers })
                 .then(res => 
                   {
                     if (res.status==401) {
@@ -109,7 +109,7 @@ class Updatecustomer extends React.Component {
         
       };
       console.log(requestOptions)
-      fetch('https://localhost:5002/v1/customers/'+this.props.customerId, requestOptions)
+      fetch('https://foiadev.diag.uniroma1.it:5002/v1/customers/'+this.props.customerId, requestOptions)
           .then(response => {
             console.log(response.json())
             if (response.status == 200) {

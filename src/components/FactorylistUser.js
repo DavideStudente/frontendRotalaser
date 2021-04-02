@@ -46,7 +46,7 @@ class FactorylistUser extends React.Component {
     //const headers = {'key': this.props.location.state };
     const headers = {'key': sessionStorage.getItem('token') };
     
-      fetch("https://localhost:5002/v1/users/"+this.props.user+"/factories", { headers })
+      fetch("https://foiadev.diag.uniroma1.it:5002/v1/users/"+this.props.user+"/factories", { headers })
                 .then(res => 
                   {
                     if (res.status==401) {
@@ -107,7 +107,7 @@ class FactorylistUser extends React.Component {
       //const headers = {'key': this.props.location.state };
       const headers = {'key': sessionStorage.getItem('token') };
       
-        fetch("https://localhost:5002/v1/users/"+this.props.user+"/factories", { headers })
+        fetch("https://foiadev.diag.uniroma1.it:5002/v1/users/"+this.props.user+"/factories", { headers })
                   .then(res => 
                     {
                       if (res.status==401) {
@@ -223,7 +223,7 @@ class FactorylistUser extends React.Component {
         
       };
       console.log(requestOptions)
-      fetch('https://localhost:5002/v1/factories/'+this.state.factoryselected, requestOptions)
+      fetch('https://foiadev.diag.uniroma1.it:5002/v1/factories/'+this.state.factoryselected, requestOptions)
           .then(response => {
            
             this.setState({factoryselected: ''})

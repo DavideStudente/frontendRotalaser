@@ -114,7 +114,7 @@ class Diecutterdetails extends React.Component {
         
         //const headers = {'key': this.props.location.state };
       const headers = {'key': sessionStorage.getItem('token') };
-      fetch("https://localhost:5002/v1/diecutters/"+ this.props.match.params.handle +"/diecutterparts", { headers })
+      fetch("https://foiadev.diag.uniroma1.it:5002/v1/diecutters/"+ this.props.match.params.handle +"/diecutterparts", { headers })
               .then(res => 
                 {
                   if (res.status==401) {
@@ -152,7 +152,7 @@ class Diecutterdetails extends React.Component {
                 }
               )
         
-              fetch("https://localhost:5002/v1/diecutters/"+ this.props.match.params.handle, { headers })
+              fetch("https://foiadev.diag.uniroma1.it:5002/v1/diecutters/"+ this.props.match.params.handle, { headers })
               .then(res => 
                 {
                   if (res.status==401) {
@@ -199,7 +199,7 @@ class Diecutterdetails extends React.Component {
         this.setState({keyA: sessionStorage.getItem('token')})
         this.setState({value: this.props.match.params.handle});
         const headers = {'key': sessionStorage.getItem('token') };
-        fetch("https://localhost:5002/v1/diecutters/"+ this.props.match.params.handle +"/diecutterparts", { headers })
+        fetch("https://foiadev.diag.uniroma1.it:5002/v1/diecutters/"+ this.props.match.params.handle +"/diecutterparts", { headers })
               .then(res => 
                 {
                   if (res.status==401) {
@@ -237,7 +237,7 @@ class Diecutterdetails extends React.Component {
                 }
               )
 
-              fetch("https://localhost:5002/v1/diecutters/"+ this.props.match.params.handle, { headers })
+              fetch("https://foiadev.diag.uniroma1.it:5002/v1/diecutters/"+ this.props.match.params.handle, { headers })
               .then(res => 
                 {
                   if (res.status==401) {

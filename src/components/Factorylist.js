@@ -42,7 +42,7 @@ class Factorylist extends React.Component {
     //const headers = {'key': this.props.location.state };
     const headers = {'key': sessionStorage.getItem('token') };
     if (sessionStorage.getItem('role') == "admin") {
-      fetch("https://localhost:5002/v1/factories", { headers })
+      fetch("https://foiadev.diag.uniroma1.it:5002/v1/factories", { headers })
                 .then(res => 
                   {
                     if (res.status==401) {
@@ -80,7 +80,7 @@ class Factorylist extends React.Component {
                 )
     }
     else {
-      fetch("https://localhost:5002/v1/users/"+ usern +"/factories", { headers })
+      fetch("https://foiadev.diag.uniroma1.it:5002/v1/users/"+ usern +"/factories", { headers })
               .then(res => 
                 {
                   if (res.status==401) {
@@ -133,7 +133,7 @@ class Factorylist extends React.Component {
       //const headers = {'key': this.props.location.state };
       const headers = {'key': sessionStorage.getItem('token') };
       if (sessionStorage.getItem('role') == "admin") {
-        fetch("https://localhost:5002/v1/factories", { headers })
+        fetch("https://foiadev.diag.uniroma1.it:5002/v1/factories", { headers })
                 .then(res => 
                   {
                     if (res.status==401) {
@@ -171,7 +171,7 @@ class Factorylist extends React.Component {
                 )
       }
       else {
-        fetch("https://localhost:5002/v1/users/"+ usern +"/factories", { headers })
+        fetch("https://foiadev.diag.uniroma1.it:5002/v1/users/"+ usern +"/factories", { headers })
                 .then(res => 
                   {
                     if (res.status==401) {

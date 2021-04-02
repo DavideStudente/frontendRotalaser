@@ -55,9 +55,9 @@ class FactorylistCustomer extends React.Component {
     
     //const headers = {'key': this.props.location.state };
     const headers = {'key': sessionStorage.getItem('token') };
-    console.log("https://localhost:5002/v1/customers/"+this.props.customer+"/factories")
+    console.log("https://foiadev.diag.uniroma1.it:5002/v1/customers/"+this.props.customer+"/factories")
     
-      fetch("https://localhost:5002/v1/customers/"+this.props.customer+"/factories", { headers })
+      fetch("https://foiadev.diag.uniroma1.it:5002/v1/customers/"+this.props.customer+"/factories", { headers })
                 .then(res => 
                   {
                     if (res.status==401) {
@@ -93,7 +93,7 @@ class FactorylistCustomer extends React.Component {
                     console.log("ERRORE!" + error);
                   }
                 ).then(res => {
-                  fetch("https://localhost:5002/v1/customers/"+this.props.customer+"/users", { headers })
+                  fetch("https://foiadev.diag.uniroma1.it:5002/v1/customers/"+this.props.customer+"/users", { headers })
                 .then(res => 
                   {
                     if (res.status==401) {
@@ -156,7 +156,7 @@ class FactorylistCustomer extends React.Component {
       //const headers = {'key': this.props.location.state };
       const headers = {'key': sessionStorage.getItem('token') };
       
-        fetch("https://localhost:5002/v1/customers/"+this.props.customer+"/factories", { headers })
+        fetch("https://foiadev.diag.uniroma1.it:5002/v1/customers/"+this.props.customer+"/factories", { headers })
                   .then(res => 
                     {
                       if (res.status==401) {
@@ -192,7 +192,7 @@ class FactorylistCustomer extends React.Component {
                       console.log("ERRORE!" + error);
                     }
                   ).then(res => {
-                    fetch("https://localhost:5002/v1/customers/"+this.props.customer+"/users", { headers })
+                    fetch("https://foiadev.diag.uniroma1.it:5002/v1/customers/"+this.props.customer+"/users", { headers })
                   .then(res => 
                     {
                       if (res.status==401) {
@@ -324,7 +324,7 @@ class FactorylistCustomer extends React.Component {
         
       };
       console.log(requestOptions)
-      fetch('https://localhost:5002/v1/factories/'+this.state.factoryselected, requestOptions)
+      fetch('https://foiadev.diag.uniroma1.it:5002/v1/factories/'+this.state.factoryselected, requestOptions)
           .then(response => {
            
             this.setState({factoryselected: ''})
@@ -348,7 +348,7 @@ class FactorylistCustomer extends React.Component {
         
       };
       console.log(requestOptions)
-      fetch('https://localhost:5002/v1/users/'+this.state.userselected, requestOptions)
+      fetch('https://foiadev.diag.uniroma1.it:5002/v1/users/'+this.state.userselected, requestOptions)
           .then(response => {
            
             this.setState({userselected: ''})
