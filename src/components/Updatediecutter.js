@@ -35,9 +35,9 @@ class Creatediecutter extends React.Component {
     this.setState({keyA: sessionStorage.getItem('token')});
     this.setState({role: sessionStorage.getItem('role')})
     const headers = {'key': sessionStorage.getItem('token') };
-    console.log("https://foiadev.diag.uniroma1.it:5002/v1/diecutters/"+this.props.diecutterId)
+    console.log("https://localhost:5002/v1/diecutters/"+this.props.diecutterId)
     if (sessionStorage.getItem('role') == "admin") {
-      fetch("https://foiadev.diag.uniroma1.it:5002/v1/diecutters/"+this.props.diecutterId, { headers })
+      fetch("https://localhost:5002/v1/diecutters/"+this.props.diecutterId, { headers })
                 .then(res => 
                   {
                     if (res.status==401) {
@@ -122,7 +122,7 @@ class Creatediecutter extends React.Component {
         
       };
       console.log(requestOptions)
-      fetch('https://foiadev.diag.uniroma1.it:5002/v1/diecutters/'+this.props.diecutterId, requestOptions)
+      fetch('https://localhost:5002/v1/diecutters/'+this.props.diecutterId, requestOptions)
           .then(response => {
             console.log(response.json())
             if (response.status == 200) {
