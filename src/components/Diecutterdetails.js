@@ -26,7 +26,7 @@ class Diecutterdetails extends React.Component {
     constructor(props) {
       super(props);
       this.state = {
-        value: '', keyA: '', diecutterparts: '', image: '', diecutterdetail: '', diecutterpartselected: '',
+        value: '', keyA: '', diecutterparts: '', image: '', diecutterdetail: '', diecutterpartselected: '', diecutterRUL: '',
         MAP : {
           name: "my-map",
           areas: []
@@ -189,10 +189,47 @@ class Diecutterdetails extends React.Component {
                 }
               )
         
-        
+              fetch("https://localhost:5002/v1/predictrul/"+ this.props.match.params.handle, { headers })
+              .then(res => 
+                {
+                  if (res.status==401) {
+                    //console.log("token vecchio e scaduto!" + sessionStorage.getItem('token'));
+                    const newTok=refreshToken(sessionStorage.getItem('refreshToken'));
+                    //sessionStorage.setItem('token', newTok )
+                    //console.log("token nuovo e bellissimo!" + newTok);
+                    //console.log("token nuovo e bellissimo!" + sessionStorage.getItem('token'));
+                    this.setState({keyA: newTok})
+                    return "false";
+                    
+                  }
+                  else {
+                    return res.json()
+                  }
+                })
+              .then(
+                (result) => {
+                  if (result == "false") return;
+                  //console.log(result);
+                  this.setState({
+                    
+                    diecutterRUL: result
+                  });
+                  //displayImage();
+                  
+
+                },
+                // Note: it's important to handle errors here
+                // instead of a catch() block so that we don't swallow
+                // exceptions from actual bugs in components.
+                (error) => {
+                  console.log("ERRORE!" + error);
+                }
+              )
         
         
     }
+
+
 
     componentDidUpdate() {
       if (this.state.keyA!=sessionStorage.getItem('token')) {
@@ -274,6 +311,43 @@ class Diecutterdetails extends React.Component {
                 }
               )
 
+              fetch("https://localhost:5002/v1/predictrul/"+ this.props.match.params.handle, { headers })
+              .then(res => 
+                {
+                  if (res.status==401) {
+                    //console.log("token vecchio e scaduto!" + sessionStorage.getItem('token'));
+                    const newTok=refreshToken(sessionStorage.getItem('refreshToken'));
+                    //sessionStorage.setItem('token', newTok )
+                    //console.log("token nuovo e bellissimo!" + newTok);
+                    //console.log("token nuovo e bellissimo!" + sessionStorage.getItem('token'));
+                    this.setState({keyA: newTok})
+                    return "false";
+                    
+                  }
+                  else {
+                    return res.json()
+                  }
+                })
+              .then(
+                (result) => {
+                  if (result == "false") return;
+                  //console.log(result);
+                  this.setState({
+                    
+                    diecutterRUL: result
+                  });
+                  //displayImage();
+                  
+
+                },
+                // Note: it's important to handle errors here
+                // instead of a catch() block so that we don't swallow
+                // exceptions from actual bugs in components.
+                (error) => {
+                  console.log("ERRORE!" + error);
+                }
+              )
+
 
       }
     }
@@ -328,7 +402,7 @@ class Diecutterdetails extends React.Component {
               </Col>
               <Col style={{ backgroundColor: '#BDB76B',  border:'1px solid black'}}>
                 <Row style={{border:'1px solid black'}}> <Diecutterhistory diecutter={this.state.value} keyA={this.state.keyA} /></Row>
-                <Row > {predictchart()}</Row> 
+                <Row > {predictchart(this.state.diecutterRUL)}</Row> 
               </Col>
               <Col style={{backgroundColor: '#B8860B',  border:'1px solid black'}}> 
               <div>DIE CUTTER STATUS</div>

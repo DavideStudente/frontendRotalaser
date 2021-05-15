@@ -9,7 +9,7 @@ import {cycles} from '../fakedata/cycles'
 
 
 
-function predictchart() {
+function predictchart(numberofcycles) {
   var data = {
     labels: ["1 giorno", "1 settimana", "2 settimane", "1 mese", "3 mesi", "6 mesi", "9 mesi", "1 anno"],
     datasets: [
@@ -66,7 +66,7 @@ for (var i=0; i<data.labels.length; i++) {
 }
 return <div style={{width: '750px', height:'450px'}}>
         <div><Line  redraw={true} ref="chartpred" data={data} /></div>
-        <div> DETECTED REMAINING USEFUL LIFE IN CONSTANT CONDITIONS: <b>1 MONTH</b></div>
+        <div> DETECTED REMAINING USEFUL LIFE IN CONSTANT CONDITIONS: <b>{numberofcycles}</b></div>
       </div>
 }
 
