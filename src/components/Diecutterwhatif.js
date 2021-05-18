@@ -24,10 +24,11 @@ class Diecutterwhatif extends React.Component {
         this.state = {
             value: this.props.match.params.handle,
             periodofanalysis: "",
-            temperature: "  same as prev period ",
-            humidity: "  same as prev period ",
-            rotationspeed:"  same as prev period ",
-            cardboardperday: "  same as prev period ",
+            temperature: 'default',
+            humidity: 'default',
+            rotationspeed:'default',
+            cycles: 'default',
+            ruldetected: "calculating...",
             keyA: '', diecutterparts: '', image: '', diecutterdetail: '', diecutterpartselected: '',
             MAP : {
                 name: "my-map",
@@ -35,6 +36,7 @@ class Diecutterwhatif extends React.Component {
             }
         };
 
+        this.handleClickCalculate = this.handleClickCalculate.bind(this);
         this.handlechangeStartDate=this.handlechangeStartDate.bind(this);
       }
     
@@ -108,7 +110,7 @@ class Diecutterwhatif extends React.Component {
       }
   
       componentDidMount () {
-  
+        this.handleClickCalculate();
         this.setState({keyA: sessionStorage.getItem('token')})
           this.setState({value: this.props.match.params.handle});
           console.log(this.props.match.params.handle);
@@ -195,54 +197,100 @@ class Diecutterwhatif extends React.Component {
           
       }  
     
+
+    handleClickCalculate() {
+
+      const requestOptions = {
+          method: 'POST',
+          headers: {'key': sessionStorage.getItem('token'), 'Content-Type': 'application/json'},
+          body: JSON.stringify({ temperature: this.state.temperature, humidity: this.state.humidity, 
+            speed: this.state.rotationspeed, cycles:this.state.cycles})
+          
+        };
+        console.log(requestOptions)
+        fetch('https://localhost:5002/v1/predictrulwhatif/'+this.props.match.params.handle, requestOptions)
+            .then(response => {
+              
+              if (response.status == 200) {
+                //this.setState({ruldetected: response.json()});
+                return(response.json())
+              }
+              else {
+                alert("c'è stato un errore")
+              }
+            }).then(
+              (result) => {
+                
+                this.setState({ruldetected: result.toString()});
+
+                //displayImage();
+                
+
+              },
+              // Note: it's important to handle errors here
+              // instead of a catch() block so that we don't swallow
+              // exceptions from actual bugs in components.
+              (error) => {
+                console.log("ERRORE!" + error);
+              }
+            )
+
+    }
+
     handlechangeStartDate(event) {
         if (event.target.id=="temperature") {
+          /*
             if (event.target.value==0) {
                 this.setState({temperature:" same as prev period "});
             }
             else if (event.target.value<0) {
-                this.setState({temperature: (event.target.value + "% belov prev period ")});
+                this.setState({temperature: (event.target.value )});
             }
             else {
-                this.setState({temperature: (event.target.value + "% above prev period ")});
-            }
+                this.setState({temperature: (event.target.value)});
+            }*/
+            this.setState({temperature: (event.target.value)})
             
         }
         else if (event.target.id=="humidity") {
-            if (event.target.value==0) {
+            /*if (event.target.value==0) {
                 this.setState({humidity:" same as prev period "});
             }
             else if (event.target.value<0) {
-                this.setState({humidity: (event.target.value + "% belov prev period ")});
+                this.setState({humidity: (event.target.value )});
             }
             else {
-                this.setState({humidity: (event.target.value + "% above prev period ")});
-            }
+                this.setState({humidity: (event.target.value)});
+            }*/
+            this.setState({humidity: (event.target.value)});
             
         }
         else if (event.target.id=="rotationspeed") {
-            if (event.target.value==0) {
+            /*if (event.target.value==0) {
                 this.setState({rotationspeed:" same as prev period "});
             }
             else if (event.target.value<0) {
-                this.setState({rotationspeed: (event.target.value + "% belov prev period ")});
+                this.setState({rotationspeed: (event.target.value)});
             }
             else {
-                this.setState({rotationspeed: (event.target.value + "% above prev period ")});
-            }
-            
+                this.setState({rotationspeed: (event.target.value)});
+            }*/
+            this.setState({rotationspeed: (event.target.value)}); 
         }
-        else if (event.target.id=="cardboardperday") {
-            if (event.target.value==0) {
-                this.setState({cardboardperday:" same as prev period "});
-            }
-            else if (event.target.value<0) {
-                this.setState({cardboardperday: (event.target.value + "% belov prev period ")});
-            }
-            else {
-                this.setState({cardboardperday: (event.target.value + "% above prev period ")});
-            }
-            
+        else if (event.target.id=="cycles") {
+          /*
+          if (event.target.value==0) {
+              this.setState({cycles:1});
+          }
+          else if (event.target.value<0) {
+              this.setState({cycles: (event.target.value)});
+          }
+          else {
+              this.setState({cycles: (event.target.value)});
+          }
+          */
+          this.setState({cycles: (event.target.value)});
+
         }
         
     }
@@ -252,36 +300,48 @@ class Diecutterwhatif extends React.Component {
         
       }
 
+    valuemiddlerange(min,max,value) {
+      if(value=='default') {
+        return max/2
+      }
+      else {
+        return value
+      }
+    }
 
     render() {
         return (
             <Container fluid >
             <Row>
               <Col  style={{backgroundColor: '#BDB76B',  border:'1px solid black'}}> 
-                <Row style={{border:'1px solid black'}}>{performancechartpred()}</Row>
+                <Row style={{border:'1px solid black'}}><Col><Row>{performancechartpred()} </Row><Row><b>  RUL DETECTED: {this.state.ruldetected}</b></Row></Col></Row>
                 <Row><b>ANALYSIS PARAMETERS</b></Row>
                 <Row>
                         <label for="points"> Temperature: </label>
-                        <input type="range"  id="temperature" name="points" min="-100" max="100" onChange={this.handlechangeStartDate}/>
+                        <input type="range"  id="temperature" name="points" min="0" max="40" value={this.valuemiddlerange(0,40,this.state.temperature)} onChange={this.handlechangeStartDate}/>
                         <label> {this.state.temperature}</label>
                 </Row>
                 <Row>
                         <label for="points"> Humidity: </label>
-                        <input type="range"  id="humidity" name="points" min="-100" max="100" onChange={this.handlechangeStartDate}/>
+                        <input type="range"  id="humidity" name="points" min="0" max="100" value={this.valuemiddlerange(0,100,this.state.humidity)} onChange={this.handlechangeStartDate}/>
                         <label> {this.state.humidity}</label>
                 </Row>
                 <Row>
                         <label for="points"> Rotation Speed: </label>
-                        <input type="range"  id="rotationspeed" name="points" min="-100" max="100" onChange={this.handlechangeStartDate}/>
+                        <input type="range"  id="rotationspeed" name="points" min="2" max="9" value={this.valuemiddlerange(2,10,this.state.rotationspeed)} onChange={this.handlechangeStartDate}/>
                         <label> {this.state.rotationspeed}</label>
                 </Row>
-                <Row>
-                        <label for="points"> Cardboard Per Day: </label>
-                        <input type="range"  id="cardboardperday" name="points" min="-100" max="100" onChange={this.handlechangeStartDate}/>
-                        <label> {this.state.cardboardperday}</label>
-
-                </Row>
                 
+                <Row>
+                        <label for="points"> Cycles Number: </label>
+                        <input type="range"  id="cycles" name="points" min="1" max="20" value={this.valuemiddlerange(1,20,this.state.cycles)} onChange={this.handlechangeStartDate}/>
+                        <label> {this.state.cycles}</label>
+                </Row>
+                <Row>
+                        <button onClick={this.handleClickCalculate}>
+                          Calculate RUL
+                        </button>
+                </Row>
                 
               </Col>
               <Col style={{backgroundColor: '#B8860B',  border:'1px solid black'}}> 

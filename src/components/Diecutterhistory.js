@@ -130,7 +130,6 @@ class Diecutterhistory extends React.Component {
                 }
               )
               var tmpvalue
-              
               fetch("https://localhost:5002/v1/diecutters/"+ this.props.diecutter +"/cycles", { headers })
                           .then(res => 
                             {
@@ -233,7 +232,7 @@ componentDidUpdate() {
               }
             )
             var tmpvalue
-            
+            //TODO fix why diecutter isn't read
             fetch("https://localhost:5002/v1/diecutters/"+ this.props.diecutter +"/cycles", { headers })
                         .then(res => 
                           {

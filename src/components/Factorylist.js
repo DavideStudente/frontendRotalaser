@@ -340,8 +340,8 @@ class Factorylist extends React.Component {
 
     else {
       var factorysel=this.state.factoryselected;
-      factoriesList.push(<Col><div><b>YOU ARE IN THE OVERVIEW OF THE FACTORY WITH ID: {this.state.factoryselected}</b> </div></Col>);
-      factoriesList.push(<div><Diecutterlist username={this.state.username} keyA={this.state.keyA} factory={this.state.factoryselected}/></div>)
+      factoriesList.push(<Row><div><b>YOU ARE IN THE OVERVIEW OF THE FACTORY WITH ID: {this.state.factoryselected}</b> </div></Row>);
+      factoriesList.push(<Row><Diecutterlist username={this.state.username} keyA={this.state.keyA} factory={this.state.factoryselected}/></Row>)
       return factoriesList;
        
       
@@ -382,7 +382,7 @@ class Factorylist extends React.Component {
           
           
         </Row>
-        <Row>{this.displayChoose()}</Row>
+        <Row><Col>{this.displayChoose()}</Col></Row>
       </Container>
       
     );

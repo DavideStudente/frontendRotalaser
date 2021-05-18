@@ -26,7 +26,8 @@ class Diecutterdetails extends React.Component {
     constructor(props) {
       super(props);
       this.state = {
-        value: '', keyA: '', diecutterparts: '', image: '', diecutterdetail: '', diecutterpartselected: '', diecutterRUL: '',
+        value: '', keyA: '', diecutterparts: '', image: '', diecutterdetail: '', diecutterpartselected: '', 
+        diecutterRUL: 'calculating...',
         MAP : {
           name: "my-map",
           areas: []
@@ -134,7 +135,6 @@ class Diecutterdetails extends React.Component {
               .then(
                 (result) => {
                   if (result == "false") return;
-                  console.log(result);
                   this.displayImage(result);
                   this.setState({
                     
@@ -172,7 +172,7 @@ class Diecutterdetails extends React.Component {
               .then(
                 (result) => {
                   if (result == "false") return;
-                  //console.log(result);
+                  console.log(result);
                   this.setState({
                     
                     diecutterdetail: result
@@ -209,10 +209,10 @@ class Diecutterdetails extends React.Component {
               .then(
                 (result) => {
                   if (result == "false") return;
-                  //console.log(result);
+                  console.log(result);
                   this.setState({
                     
-                    diecutterRUL: result
+                    diecutterRUL: result.toString()
                   });
                   //displayImage();
                   
@@ -401,7 +401,7 @@ class Diecutterdetails extends React.Component {
                 <Row > {this.displayDieCutterDetails()}</Row> 
               </Col>
               <Col style={{ backgroundColor: '#BDB76B',  border:'1px solid black'}}>
-                <Row style={{border:'1px solid black'}}> <Diecutterhistory diecutter={this.state.value} keyA={this.state.keyA} /></Row>
+                <Row style={{border:'1px solid black'}}> <Diecutterhistory diecutter={this.props.match.params.handle} keyA={this.state.keyA} /></Row>
                 <Row > {predictchart(this.state.diecutterRUL)}</Row> 
               </Col>
               <Col style={{backgroundColor: '#B8860B',  border:'1px solid black'}}> 
