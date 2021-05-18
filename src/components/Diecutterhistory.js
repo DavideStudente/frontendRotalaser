@@ -52,7 +52,7 @@ const data = {
   labels: [],
   datasets: [
     {
-      label: 'cardboards produced',
+      label: 'humidity',
       fill: false,
       lineTension: 0.1,
       backgroundColor: 'rgba(75,192,192,0.4)',
@@ -62,6 +62,48 @@ const data = {
       borderDashOffset: 0.0,
       borderJoinStyle: 'miter',
       pointBorderColor: 'rgba(75,192,192,1)',
+      pointBackgroundColor: '#fff',
+      pointBorderWidth: 1,
+      pointHoverRadius: 5,
+      pointHoverBackgroundColor: 'rgba(75,192,192,1)',
+      pointHoverBorderColor: 'rgba(220,220,220,1)',
+      pointHoverBorderWidth: 2,
+      pointRadius: 1,
+      pointHitRadius: 10,
+      data: []
+    },
+    {
+      label: 'temperature',
+      fill: false,
+      lineTension: 0.1,
+      backgroundColor: 'rgba(75,192,192,0.4)',
+      borderColor: 'orange',
+      borderCapStyle: 'butt',
+      borderDash: [],
+      borderDashOffset: 0.0,
+      borderJoinStyle: 'miter',
+      pointBorderColor: 'orange',
+      pointBackgroundColor: '#fff',
+      pointBorderWidth: 1,
+      pointHoverRadius: 5,
+      pointHoverBackgroundColor: 'rgba(75,192,192,1)',
+      pointHoverBorderColor: 'rgba(220,220,220,1)',
+      pointHoverBorderWidth: 2,
+      pointRadius: 1,
+      pointHitRadius: 10,
+      data: []
+    },
+    {
+      label: 'errors',
+      fill: false,
+      lineTension: 0.1,
+      backgroundColor: 'rgba(75,192,192,0.4)',
+      borderColor: 'red',
+      borderCapStyle: 'butt',
+      borderDash: [],
+      borderDashOffset: 0.0,
+      borderJoinStyle: 'miter',
+      pointBorderColor: 'red',
       pointBackgroundColor: '#fff',
       pointBorderWidth: 1,
       pointHoverRadius: 5,
@@ -129,7 +171,7 @@ class Diecutterhistory extends React.Component {
                   console.log("ERRORE!" + error);
                 }
               )
-              var tmpvalue
+            
               fetch("https://localhost:5002/v1/diecutters/"+ this.props.diecutter +"/cycles", { headers })
                           .then(res => 
                             {
@@ -155,11 +197,78 @@ class Diecutterhistory extends React.Component {
                               console.log("CYCLES PERVENUTI");
                               console.log(cycles);
                               
-                              var tmpvalue=data;
+                              var tmpvalue= {
+                                labels: [],
+                                datasets: [
+                                  {
+                                    label: 'humidity',
+                                    fill: false,
+                                    lineTension: 0.1,
+                                    backgroundColor: 'rgba(75,192,192,0.4)',
+                                    borderColor: 'rgba(75,192,192,1)',
+                                    borderCapStyle: 'butt',
+                                    borderDash: [],
+                                    borderDashOffset: 0.0,
+                                    borderJoinStyle: 'miter',
+                                    pointBorderColor: 'rgba(75,192,192,1)',
+                                    pointBackgroundColor: '#fff',
+                                    pointBorderWidth: 1,
+                                    pointHoverRadius: 5,
+                                    pointHoverBackgroundColor: 'rgba(75,192,192,1)',
+                                    pointHoverBorderColor: 'rgba(220,220,220,1)',
+                                    pointHoverBorderWidth: 2,
+                                    pointRadius: 1,
+                                    pointHitRadius: 10,
+                                    data: []
+                                  },
+                                  {
+                                    label: 'temperature',
+                                    fill: false,
+                                    lineTension: 0.1,
+                                    backgroundColor: 'rgba(75,192,192,0.4)',
+                                    borderColor: 'orange',
+                                    borderCapStyle: 'butt',
+                                    borderDash: [],
+                                    borderDashOffset: 0.0,
+                                    borderJoinStyle: 'miter',
+                                    pointBorderColor: 'orange',
+                                    pointBackgroundColor: '#fff',
+                                    pointBorderWidth: 1,
+                                    pointHoverRadius: 5,
+                                    pointHoverBackgroundColor: 'rgba(75,192,192,1)',
+                                    pointHoverBorderColor: 'rgba(220,220,220,1)',
+                                    pointHoverBorderWidth: 2,
+                                    pointRadius: 1,
+                                    pointHitRadius: 10,
+                                    data: []
+                                  },
+                                  {
+                                    label: 'errors',
+                                    fill: false,
+                                    lineTension: 0.1,
+                                    backgroundColor: 'rgba(75,192,192,0.4)',
+                                    borderColor: 'red',
+                                    borderCapStyle: 'butt',
+                                    borderDash: [],
+                                    borderDashOffset: 0.0,
+                                    borderJoinStyle: 'miter',
+                                    pointBorderColor: 'red',
+                                    pointBackgroundColor: '#fff',
+                                    pointBorderWidth: 1,
+                                    pointHoverRadius: 5,
+                                    pointHoverBackgroundColor: 'rgba(75,192,192,1)',
+                                    pointHoverBorderColor: 'rgba(220,220,220,1)',
+                                    pointHoverBorderWidth: 2,
+                                    pointRadius: 1,
+                                    pointHitRadius: 10,
+                                    data: []
+                                  }
+                                ]
+                              };
                               //console.log(tmpvalue);
                               //console.log(tmpvalue.labels);
                               
-                              
+                              var preverror=0
                               for (var i=0; i<cycles.length; i++) {
                                   tmpvalue.labels.push(new Date(cycles[i].createdAt));
                                   //console.log(new Date(cycles[i].createdAt));
@@ -167,8 +276,9 @@ class Diecutterhistory extends React.Component {
                                   //tmpvalue.labels.push(cycles[i].day + "/"+cycles[i].month+"/"+cycles[i].year+ " " +cycles[i].hour+":"+cycles[i].minute);
                                   //console.log(cycles[i].day + "/"+cycles[i].month+"/"+cycles[i].year+ " " +cycles[i].hour+":"+cycles[i].minute+ "  value:"+ cycles[i].value);
                                   tmpvalue.datasets[0].data.push(cycles[i].humidity);
-                                  
-                                  
+                                  tmpvalue.datasets[1].data.push(cycles[i].temperature);
+                                  tmpvalue.datasets[2].data.push(cycles[i].errors-preverror);
+                                  preverror=cycles[i].errors
                                   
                               }
                               console.log(tmpvalue);
@@ -231,7 +341,6 @@ componentDidUpdate() {
                 console.log("ERRORE!" + error);
               }
             )
-            var tmpvalue
             //TODO fix why diecutter isn't read
             fetch("https://localhost:5002/v1/diecutters/"+ this.props.diecutter +"/cycles", { headers })
                         .then(res => 
@@ -258,10 +367,78 @@ componentDidUpdate() {
                             console.log("CYCLES PERVENUTI");
                             console.log(cycles);
                             
-                            var tmpvalue=data;
+                            var tmpvalue= {
+                              labels: [],
+                              datasets: [
+                                {
+                                  label: 'humidity',
+                                  fill: false,
+                                  lineTension: 0.1,
+                                  backgroundColor: 'rgba(75,192,192,0.4)',
+                                  borderColor: 'rgba(75,192,192,1)',
+                                  borderCapStyle: 'butt',
+                                  borderDash: [],
+                                  borderDashOffset: 0.0,
+                                  borderJoinStyle: 'miter',
+                                  pointBorderColor: 'rgba(75,192,192,1)',
+                                  pointBackgroundColor: '#fff',
+                                  pointBorderWidth: 1,
+                                  pointHoverRadius: 5,
+                                  pointHoverBackgroundColor: 'rgba(75,192,192,1)',
+                                  pointHoverBorderColor: 'rgba(220,220,220,1)',
+                                  pointHoverBorderWidth: 2,
+                                  pointRadius: 1,
+                                  pointHitRadius: 10,
+                                  data: []
+                                },
+                                {
+                                  label: 'temperature',
+                                  fill: false,
+                                  lineTension: 0.1,
+                                  backgroundColor: 'rgba(75,192,192,0.4)',
+                                  borderColor: 'orange',
+                                  borderCapStyle: 'butt',
+                                  borderDash: [],
+                                  borderDashOffset: 0.0,
+                                  borderJoinStyle: 'miter',
+                                  pointBorderColor: 'orange',
+                                  pointBackgroundColor: '#fff',
+                                  pointBorderWidth: 1,
+                                  pointHoverRadius: 5,
+                                  pointHoverBackgroundColor: 'rgba(75,192,192,1)',
+                                  pointHoverBorderColor: 'rgba(220,220,220,1)',
+                                  pointHoverBorderWidth: 2,
+                                  pointRadius: 1,
+                                  pointHitRadius: 10,
+                                  data: []
+                                },
+                                {
+                                  label: 'errors',
+                                  fill: false,
+                                  lineTension: 0.1,
+                                  backgroundColor: 'rgba(75,192,192,0.4)',
+                                  borderColor: 'red',
+                                  borderCapStyle: 'butt',
+                                  borderDash: [],
+                                  borderDashOffset: 0.0,
+                                  borderJoinStyle: 'miter',
+                                  pointBorderColor: 'red',
+                                  pointBackgroundColor: '#fff',
+                                  pointBorderWidth: 1,
+                                  pointHoverRadius: 5,
+                                  pointHoverBackgroundColor: 'rgba(75,192,192,1)',
+                                  pointHoverBorderColor: 'rgba(220,220,220,1)',
+                                  pointHoverBorderWidth: 2,
+                                  pointRadius: 1,
+                                  pointHitRadius: 10,
+                                  data: []
+                                }
+                              ]
+                            };
                             //console.log(tmpvalue);
                             //console.log(tmpvalue.labels);
                             
+                            var preverror=0;
                             
                             for (var i=0; i<cycles.length; i++) {
                                 tmpvalue.labels.push(new Date(cycles[i].createdAt));
@@ -270,10 +447,14 @@ componentDidUpdate() {
                                 //tmpvalue.labels.push(cycles[i].day + "/"+cycles[i].month+"/"+cycles[i].year+ " " +cycles[i].hour+":"+cycles[i].minute);
                                 //console.log(cycles[i].day + "/"+cycles[i].month+"/"+cycles[i].year+ " " +cycles[i].hour+":"+cycles[i].minute+ "  value:"+ cycles[i].value);
                                 tmpvalue.datasets[0].data.push(cycles[i].humidity);
+                                tmpvalue.datasets[1].data.push(cycles[i].temperature);
+                                tmpvalue.datasets[2].data.push(cycles[i].errors-preverror);
+                                preverror=cycles[i].errors
                                 
                                 
                                 
                             }
+                            console.log(tmpvalue.datasets)
                             console.log(tmpvalue);
                             this.setState({data: tmpvalue});
                             //return tmpvalue;
